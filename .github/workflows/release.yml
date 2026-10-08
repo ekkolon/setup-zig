@@ -96,7 +96,15 @@ jobs:
           VERSION: ${{ inputs.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$VERSION" -f sha="$GITHUB_SHA"
+          tag_ref="repos/$GITHUB_REPOSITORY/git/ref/tags/$VERSION"
+          if gh api "$tag_ref" >/dev/null 2>&1; then
+            test "$(gh api "$tag_ref" --jq '.object.sha')" = "$GITHUB_SHA" || {
+              echo 'The release tag already points to another commit.' >&2
+              exit 1
+            }
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$VERSION" -f sha="$GITHUB_SHA"
+          fi
           gh release create "$VERSION" release/* --verify-tag --generate-notes --title "$VERSION"
           major="${VERSION%%.*}"
           if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$major" >/dev/null 2>&1; then
