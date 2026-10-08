@@ -83,7 +83,6 @@ test('releases require immutability and attest their archive and SBOM', async ()
   assert.ok(immutabilityCheck < publishScript.indexOf('major='));
 });
 
-
 test('CodeQL checks maintained source rather than generated bundles', async () => {
   const workflow = parse(
     await readFile('.github/workflows/codeql.yml', 'utf8'),
