@@ -25,6 +25,6 @@ Keep the input surface small. Add a regression test for changes to version resol
 
 1. Update the version in `package.json`. Refresh the lockfile only if dependencies change; rebuild `dist/` and merge.
 2. Make the repository public, enable immutable releases and private vulnerability reporting, then run the **Release** workflow from `main` with a tag such as `v1.0.0`.
-3. The workflow runs the full test matrix, generates a release archive, CycloneDX SBOM, checksums, and signed attestations, then publishes the immutable version tag and release. The matching major tag (for example, `v1`) advances to the new version.
+3. The workflow runs the full test matrix, generates a release archive, CycloneDX SBOM, checksums, and signed attestations, then publishes the immutable version tag and release. The workflow confirms the published release is immutable before advancing the matching major tag (for example, `v1`).
 
 Verify the release and its assets as described in [Security](SECURITY.md#release-provenance). Publish the action to GitHub Marketplace from the release page if desired. Version tags are immutable; major tags follow compatible updates.

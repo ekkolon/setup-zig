@@ -50,9 +50,9 @@ test('releases require immutability and attest their archive and SBOM', async ()
   );
   const validate = workflow.jobs.validate.steps.find(
     (step: {name?: string}) =>
-      step.name === 'Validate version and release settings',
+      step.name === 'Validate release version and visibility',
   );
-  assert.match(validate.run, /immutable-releases/);
+  assert.doesNotMatch(validate.run, /immutable-releases/);
   assert.match(validate.run, /REPOSITORY_PRIVATE/);
 
   const publish = workflow.jobs.publish;
@@ -76,5 +76,9 @@ test('releases require immutability and attest their archive and SBOM', async ()
     'release/setup-zig-*.tar.gz',
   );
   assert.equal(attestations[1].with['sbom-path'], 'release/sbom.cdx.json');
-  assert.match(publish.steps.at(-1).run, /gh release create[^\n]+release\/\*/);
+  const publishScript: string = publish.steps.at(-1).run;
+  assert.match(publishScript, /gh release create[^\n]+release\/\*/);
+  const immutabilityCheck = publishScript.indexOf('--json isImmutable');
+  assert.ok(immutabilityCheck > publishScript.indexOf('gh release create'));
+  assert.ok(immutabilityCheck < publishScript.indexOf('major='));
 });
