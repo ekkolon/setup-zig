@@ -100,7 +100,8 @@ test('legacy 32-bit archives use i386 through Zig 0.10.x', () => {
     master: {version: '0.17.0'},
     '0.7.0': {
       'i386-linux': {
-        tarball: 'https://ziglang.org/download/0.7.0/zig-linux-i386-0.7.0.tar.xz',
+        tarball:
+          'https://ziglang.org/download/0.7.0/zig-linux-i386-0.7.0.tar.xz',
         shasum: 'a'.repeat(64),
         size: '38530596',
       },
