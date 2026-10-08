@@ -575,13 +575,17 @@ function resolvePlatform(os2, arch2) {
   }
   return { os: operatingSystem, arch: architecture };
 }
+function getPublishedArchitecture(version, architecture) {
+  return architecture === "x86" && import_semver.default.lt(version, "0.11.0") ? "i386" : architecture;
+}
 function getArchiveFilenames(version, target) {
   if (parseVersionRequest(version).kind !== "exact") {
     throw new Error("Expected an exact Zig version.");
   }
   const extension = target.os === "windows" ? "zip" : "tar.xz";
-  const current = `zig-${target.arch}-${target.os}-${version}.${extension}`;
-  const legacy = `zig-${target.os}-${target.arch}-${version}.${extension}`;
+  const architecture = getPublishedArchitecture(version, target.arch);
+  const current = `zig-${architecture}-${target.os}-${version}.${extension}`;
+  const legacy = `zig-${target.os}-${architecture}-${version}.${extension}`;
   if (version.startsWith("0.15.0-dev.")) {
     return [current, legacy];
   }
@@ -609,7 +613,7 @@ function resolveReleaseFromIndex(index, request, target) {
     throw new Error("Zig index contains an invalid version.");
   }
   const entry = index[request.kind === "master" ? "master" : version];
-  const artifact = isRecord(entry) ? entry[`${target.arch}-${target.os}`] : void 0;
+  const artifact = isRecord(entry) ? entry[`${getPublishedArchitecture(version, target.arch)}-${target.os}`] : void 0;
   if (!isRecord(artifact) || typeof artifact.tarball !== "string" || typeof artifact.shasum !== "string" || !/^[a-f0-9]{64}$/.test(artifact.shasum)) {
     throw new Error(
       `Zig ${version} has no valid archive for ${target.os}/${target.arch}.`
