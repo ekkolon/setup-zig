@@ -1,0 +1,5 @@
+node_modules/
+coverage/
+.zig-cache/
+zig-out/
+*.log

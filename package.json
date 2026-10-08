@@ -1,0 +1,38 @@
+{
+  "name": "setup-zig",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Set up Zig in GitHub Actions",
+  "type": "module",
+  "license": "MIT",
+  "repository": "github:ekkolon/setup-zig",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check-dist": "npm run build && git diff --exit-code -- dist",
+    "format": "biome check --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.ts",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@actions/cache": "6.3.0",
+    "@actions/core": "3.0.1",
+    "@actions/exec": "3.0.0",
+    "@actions/glob": "0.7.0",
+    "@actions/http-client": "4.0.1",
+    "@actions/tool-cache": "4.0.0",
+    "semver": "7.8.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@types/node": "24.19.1",
+    "@types/semver": "7.8.0",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2",
+    "yaml": "2.9.1"
+  }
+}
