@@ -10,6 +10,7 @@ interface WorkflowJob {
 
 test('action entrypoints, inputs, and post condition form a consistent package', async () => {
   const action = parse(await readFile('action.yml', 'utf8'));
+  assert.equal(action.name, 'Setup Zig Toolchain');
   assert.equal(action.runs.using, 'node24');
   assert.equal(action.runs['post-if'], 'success()');
   assert.equal(action.inputs.cache.default, 'true');
