@@ -45,9 +45,12 @@ test('workflow actions are pinned and untrusted code does not receive write perm
 });
 
 test('releases require immutability and attest their archive and SBOM', async () => {
-  const workflow = parse(await readFile('.github/workflows/release.yml', 'utf8'));
+  const workflow = parse(
+    await readFile('.github/workflows/release.yml', 'utf8'),
+  );
   const validate = workflow.jobs.validate.steps.find(
-    (step: {name?: string}) => step.name === 'Validate version and release settings',
+    (step: {name?: string}) =>
+      step.name === 'Validate version and release settings',
   );
   assert.match(validate.run, /immutable-releases/);
   assert.match(validate.run, /REPOSITORY_PRIVATE/);
@@ -64,14 +67,14 @@ test('releases require immutability and attest their archive and SBOM', async ()
   assert.match(packageStep.run, /pnpm sbom[^\n]+--prod/);
   assert.match(packageStep.run, /sha256sum/);
 
-  const attestations = publish.steps.filter(
-    (step: {uses?: string}) => step.uses?.startsWith('actions/attest@'),
+  const attestations = publish.steps.filter((step: {uses?: string}) =>
+    step.uses?.startsWith('actions/attest@'),
   );
   assert.equal(attestations.length, 2);
-  assert.equal(attestations[0].with['subject-path'], 'release/setup-zig-*.tar.gz');
-  assert.equal(attestations[1].with['sbom-path'], 'release/sbom.cdx.json');
-  assert.match(
-    publish.steps.at(-1).run,
-    /gh release create[^\n]+release\/\*/,
+  assert.equal(
+    attestations[0].with['subject-path'],
+    'release/setup-zig-*.tar.gz',
   );
+  assert.equal(attestations[1].with['sbom-path'], 'release/sbom.cdx.json');
+  assert.match(publish.steps.at(-1).run, /gh release create[^\n]+release\/\*/);
 });

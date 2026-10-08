@@ -36,7 +36,7 @@ jobs:
             echo 'Make the repository public before publishing attestations.' >&2
             exit 1
           fi
-          if ! gh api "repos/$GITHUB_REPOSITORY/immutable-releases" --silent; then
+          if ! gh api -H "X-GitHub-Api-Version: 2026-03-10" "repos/$GITHUB_REPOSITORY/immutable-releases" --silent; then
             echo 'Enable immutable releases in repository settings first.' >&2
             exit 1
           fi
