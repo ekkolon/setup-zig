@@ -11,12 +11,12 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check-dist": "npm run build && git diff --exit-code -- dist",
+    "check-dist": "pnpm run build && git diff --exit-code -- dist",
     "format": "biome check --write .",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "test": "node --test test/*.test.ts",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+    "check": "pnpm run lint && pnpm run typecheck && pnpm test && pnpm run build"
   },
   "dependencies": {
     "@actions/cache": "6.3.0",
@@ -34,5 +34,6 @@
     "esbuild": "0.28.2",
     "typescript": "7.0.2",
     "yaml": "2.9.1"
-  }
+  },
+  "packageManager": "pnpm@12.10.1"
 }

@@ -33,17 +33,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3
         with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - run: npm run check
+          cache: true
+          require-lockfile: true
+      - run: pnpm run check
       - name: Check committed bundles
         run: |
           git diff --exit-code -- dist
           test -z "$(git ls-files --others --exclude-standard dist)"
-      - run: npm audit --omit=dev --audit-level=moderate
+      - run: pnpm audit --prod --audit-level moderate
 
   smoke:
     needs: check
