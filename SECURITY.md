@@ -23,6 +23,7 @@ gh release verify v1.0.0 -R ekkolon/setup-zig
 gh release download v1.0.0 -R ekkolon/setup-zig --pattern 'setup-zig-*.tar.gz'
 gh release verify-asset v1.0.0 setup-zig-v1.0.0.tar.gz -R ekkolon/setup-zig
 gh attestation verify setup-zig-v1.0.0.tar.gz -R ekkolon/setup-zig
+gh attestation verify setup-zig-v1.0.0.tar.gz -R ekkolon/setup-zig --predicate-type https://cyclonedx.org/bom
 ```
 
 The release also provides `sbom.cdx.json` and `SHA256SUMS`. The `v1` major tag intentionally moves to compatible releases; pin a full action commit SHA or an immutable version tag when evaluating a fixed dependency. Attestations identify the publishing workflow and artifacts, but do not certify that the code is vulnerability-free or compliant with a particular standard.
