@@ -93,4 +93,6 @@ Linux, macOS, and Windows are supported on x64 and arm64. Linux and Windows also
 
 The action uses Node 24 supplied by the Actions runner. Self-hosted runners need version 2.327.1 or later. Linux and macOS require `tar` with xz support; Windows requires PowerShell. No Node installation step or GitHub token input is needed.
 
+Release archives have signed provenance, a CycloneDX SBOM, and immutable release attestations. See [release verification](SECURITY.md#release-provenance).
+
 [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [License](LICENSE)

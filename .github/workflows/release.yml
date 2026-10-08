@@ -24,39 +24,80 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Validate version
+      - name: Validate version and release settings
         env:
           VERSION: ${{ inputs.version }}
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
           GH_TOKEN: ${{ github.token }}
         run: |
           [[ "$VERSION" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
           test "v$(jq -r '.version' package.json)" = "$VERSION"
+          if [[ "$REPOSITORY_PRIVATE" != false ]]; then
+            echo 'Make the repository public before publishing attestations.' >&2
+            exit 1
+          fi
+          if ! gh api "repos/$GITHUB_REPOSITORY/immutable-releases" --silent; then
+            echo 'Enable immutable releases in repository settings first.' >&2
+            exit 1
+          fi
           if gh release view "$VERSION" >/dev/null 2>&1; then
             echo 'This release already exists.' >&2
             exit 1
           fi
+
   test:
     needs: validate
     uses: ./.github/workflows/ci.yml
     with:
       full: true
+
   publish:
     needs: test
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Publish release and update the major tag
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3
+        with:
+          cache: true
+          require-lockfile: true
+      - name: Prepare release assets
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          git archive --format=tar --prefix=setup-zig/ "$GITHUB_SHA" |
+            gzip -n > "release/setup-zig-$VERSION.tar.gz"
+          pnpm sbom --sbom-format cyclonedx --sbom-spec-version 1.6 --prod --out release/sbom.cdx.json
+          jq -e '.bomFormat == "CycloneDX" and (.components | length >= 7)' release/sbom.cdx.json
+          (
+            cd release
+            sha256sum "setup-zig-$VERSION.tar.gz" sbom.cdx.json > SHA256SUMS
+          )
+      - name: Attest release archive
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: release/setup-zig-*.tar.gz
+      - name: Attest production dependencies
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: release/setup-zig-*.tar.gz
+          sbom-path: release/sbom.cdx.json
+      - name: Publish immutable release and update the major tag
         env:
           VERSION: ${{ inputs.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
           gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$VERSION" -f sha="$GITHUB_SHA"
-          gh release create "$VERSION" --verify-tag --generate-notes --title "$VERSION"
+          gh release create "$VERSION" release/* --verify-tag --generate-notes --title "$VERSION"
           major="${VERSION%%.*}"
           if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$major" >/dev/null 2>&1; then
             gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/$major" -f sha="$GITHUB_SHA" -F force=true
