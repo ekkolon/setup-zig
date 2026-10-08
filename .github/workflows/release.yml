@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Validate version and release settings
+      - name: Validate release version and visibility
         env:
           VERSION: ${{ inputs.version }}
           REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
@@ -34,10 +34,6 @@ jobs:
           test "v$(jq -r '.version' package.json)" = "$VERSION"
           if [[ "$REPOSITORY_PRIVATE" != false ]]; then
             echo 'Make the repository public before publishing attestations.' >&2
-            exit 1
-          fi
-          if ! gh api -H "X-GitHub-Api-Version: 2026-03-10" "repos/$GITHUB_REPOSITORY/immutable-releases" --silent; then
-            echo 'Enable immutable releases in repository settings first.' >&2
             exit 1
           fi
           if gh release view "$VERSION" >/dev/null 2>&1; then
@@ -106,6 +102,10 @@ jobs:
             gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$VERSION" -f sha="$GITHUB_SHA"
           fi
           gh release create "$VERSION" release/* --verify-tag --generate-notes --title "$VERSION"
+          if [[ "$(gh release view "$VERSION" --json isImmutable --jq '.isImmutable')" != true ]]; then
+            echo 'Release is not immutable. Enable immutable releases in repository settings.' >&2
+            exit 1
+          fi
           major="${VERSION%%.*}"
           if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$major" >/dev/null 2>&1; then
             gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/$major" -f sha="$GITHUB_SHA" -F force=true
