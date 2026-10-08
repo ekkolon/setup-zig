@@ -26,7 +26,7 @@ import {
   warning,
   which,
   writeJson
-} from "./chunk-XR76OSXA.js";
+} from "./chunk-72S36MPG.js";
 
 // src/main.ts
 import path5 from "node:path";
@@ -44,14 +44,14 @@ import {
 } from "node:fs/promises";
 import path3 from "node:path";
 
-// node_modules/@actions/tool-cache/lib/tool-cache.js
+// node_modules/.pnpm/@actions+tool-cache@4.0.0/node_modules/@actions/tool-cache/lib/tool-cache.js
 import * as crypto from "crypto";
 import * as fs from "fs";
 
-// node_modules/@actions/tool-cache/lib/manifest.js
+// node_modules/.pnpm/@actions+tool-cache@4.0.0/node_modules/@actions/tool-cache/lib/manifest.js
 var semver = __toESM(require_semver(), 1);
 
-// node_modules/@actions/tool-cache/lib/tool-cache.js
+// node_modules/.pnpm/@actions+tool-cache@4.0.0/node_modules/@actions/tool-cache/lib/tool-cache.js
 import * as os from "os";
 import * as path from "path";
 var semver2 = __toESM(require_semver(), 1);
