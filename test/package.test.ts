@@ -81,5 +81,4 @@ test('releases require immutability and attest their archive and SBOM', async ()
   const immutabilityCheck = publishScript.indexOf('--json isImmutable');
   assert.ok(immutabilityCheck > publishScript.indexOf('gh release create'));
   assert.ok(immutabilityCheck < publishScript.indexOf('major='));
-
 });
