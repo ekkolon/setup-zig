@@ -38,6 +38,7 @@ interface InstallOptions {
   release: Release;
   target: Platform;
   cache: CacheStore;
+  onWarning?: (message: string) => void;
   /** Called only after both archive caches miss. */
   getMirrors: () => Promise<string[]>;
 }
@@ -141,6 +142,7 @@ async function restoreActionsArchive(
   directory: string,
   release: Release,
   cache: CacheStore,
+  warn: (message: string) => void,
 ): Promise<VerifiedArchive | undefined> {
   for (const filename of release.filenames) {
     const archive = path.join(directory, filename);
@@ -157,9 +159,7 @@ async function restoreActionsArchive(
       const sha256 = await verifyArchive(archive, signature, filename, release);
       return {filename, sha256};
     } catch (error) {
-      core.warning(
-        `Ignoring invalid Zig archive cache: ${getErrorMessage(error)}`,
-      );
+      warn(`Ignoring invalid Zig archive cache: ${getErrorMessage(error)}`);
       await resetDirectory(directory);
     }
   }
@@ -235,7 +235,12 @@ export async function installZig(
       }
     }
     if (!verified) {
-      verified = await restoreActionsArchive(directory, release, options.cache);
+      verified = await restoreActionsArchive(
+        directory,
+        release,
+        options.cache,
+        options.onWarning ?? core.warning,
+      );
       if (verified) {
         source = 'actions-cache';
       }

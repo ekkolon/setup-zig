@@ -132,6 +132,7 @@ test('a remote metadata hit avoids contacting ziglang.org', async (context) => {
 test('expired version metadata fails closed; mirrors have a bounded stale fallback', async (context) => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'setup-zig-stale-'));
   context.after(() => rm(root, {recursive: true, force: true}));
+  const warnings: string[] = [];
   const options = {
     root,
     cache: memoryCache().store,
@@ -140,6 +141,7 @@ test('expired version metadata fails closed; mirrors have a bounded stale fallba
     ttlMs: 1000,
     now: 5000,
     parse: JSON.parse,
+    onWarning: (message: string) => warnings.push(message),
     fetchText: async () => {
       throw new Error('HTTP 429');
     },
@@ -158,6 +160,9 @@ test('expired version metadata fails closed; mirrors have a bounded stale fallba
     readCachedMetadata({...options, maxStaleAgeMs: 2000}),
     /HTTP 429/,
   );
+  assert.deepEqual(warnings, [
+    'Could not refresh index; using the cached list: HTTP 429',
+  ]);
 });
 
 test('malformed, future-dated, and wrong-origin metadata cannot suppress a refresh', async (context) => {
@@ -356,6 +361,7 @@ for (const cacheResult of ['partial', 'invalid']) {
     });
     let archiveDirectory = '';
     let saved = false;
+    const warnings: string[] = [];
     const cache: CacheStore = {
       restore: async (paths, key) => {
         const archive = paths[0] ?? '';
@@ -377,6 +383,7 @@ for (const cacheResult of ['partial', 'invalid']) {
         },
         target: {os: 'linux', arch: 'x86_64'},
         cache,
+        onWarning: (message: string) => warnings.push(message),
         getMirrors: async () => {
           assert.deepEqual(await readdir(archiveDirectory), []);
           throw new Error('download boundary reached');
@@ -385,5 +392,11 @@ for (const cacheResult of ['partial', 'invalid']) {
       /download boundary reached/,
     );
     assert.equal(saved, false);
+    assert.deepEqual(
+      warnings,
+      cacheResult === 'invalid'
+        ? ['Ignoring invalid Zig archive cache: Malformed minisign signature.']
+        : [],
+    );
   });
 }

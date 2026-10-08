@@ -23,6 +23,7 @@ interface MetadataOptions<T> {
   cache: CacheStore;
   parse: (body: string) => T;
   forceRefresh?: boolean;
+  onWarning?: (message: string) => void;
   /** Maximum age allowed after a failed refresh; disabled when omitted. */
   maxStaleAgeMs?: number;
   now?: number;
@@ -121,7 +122,7 @@ export async function readCachedMetadata<T>(
       options.maxStaleAgeMs &&
       now - saved.fetchedAt < options.maxStaleAgeMs
     ) {
-      core.warning(
+      (options.onWarning ?? core.warning)(
         `Could not refresh ${options.name}; using the cached list: ${getErrorMessage(error)}`,
       );
       return options.parse(saved.body);
