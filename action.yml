@@ -1,4 +1,4 @@
-name: Zig Toolchain Setup
+name: Setup Zig Toolchain
 description: Install Zig with verified downloads and compiler and build caching
 author: Nelson Dominguez
 branding:
