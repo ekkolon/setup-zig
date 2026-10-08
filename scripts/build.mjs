@@ -25,7 +25,7 @@ for (const input of Object.keys(result.metafile.inputs)) {
   const marker = input.lastIndexOf('node_modules/');
   const parts = input.slice(marker + 'node_modules/'.length).split('/');
   const count = parts[0].startsWith('@') ? 2 : 1;
-  const directory = input.slice(0, marker) + 'node_modules/' + parts.slice(0, count).join('/');
+  const directory = `${input.slice(0, marker)}node_modules/${parts.slice(0, count).join('/')}`;
   packages.add(directory);
 }
 const notices = [];

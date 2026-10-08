@@ -726,6 +726,8 @@ async function install(options) {
     }
   }
   if (!found) {
+    await rm2(directory, { recursive: true, force: true });
+    await mkdir(directory, { recursive: true });
     found = await downloadArchive(directory, release, await options.mirrors());
     const archive2 = path3.join(directory, found.filename);
     await options.cache.save([archive2, `${archive2}.minisig`], archiveKey(found.filename));
@@ -801,8 +803,8 @@ async function metadata(options) {
     const body = response.status === 304 && saved ? saved.body : response.body;
     const result = options.parse(body);
     const next = { url: options.url, fetchedAt: now, body };
-    const etag = response.etag ?? saved?.etag;
-    const modified = response.modified ?? saved?.modified;
+    const etag = response.etag ?? (response.status === 304 ? saved?.etag : void 0);
+    const modified = response.modified ?? (response.status === 304 ? saved?.modified : void 0);
     if (etag) next.etag = etag;
     if (modified) next.modified = modified;
     await writeJson(file, next);

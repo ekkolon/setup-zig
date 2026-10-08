@@ -68,8 +68,8 @@ export async function metadata<T>(options: {
     const body = response.status === 304 && saved ? saved.body : response.body;
     const result = options.parse(body);
     const next: Snapshot = { url: options.url, fetchedAt: now, body };
-    const etag = response.etag ?? saved?.etag;
-    const modified = response.modified ?? saved?.modified;
+    const etag = response.etag ?? (response.status === 304 ? saved?.etag : undefined);
+    const modified = response.modified ?? (response.status === 304 ? saved?.modified : undefined);
     if (etag) next.etag = etag;
     if (modified) next.modified = modified;
     await writeJson(file, next);

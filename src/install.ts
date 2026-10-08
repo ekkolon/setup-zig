@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { cp, lstat, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import { cp, lstat, mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
@@ -150,6 +150,9 @@ export async function install(options: {
     }
   }
   if (!found) {
+    // A failed cache extraction can leave incomplete files behind.
+    await rm(directory, { recursive: true, force: true });
+    await mkdir(directory, { recursive: true });
     found = await downloadArchive(directory, release, await options.mirrors());
     const archive = path.join(directory, found.filename);
     // Save the signed archive before project code can run or modify the installation.

@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import { buildKeys, directorySize, saveBuildCache } from '../src/build-cache.ts';
 import type { CacheStore } from '../src/cache.ts';
 import { httpsUrl } from '../src/http.ts';
-import { archiveKey, artifactUrl, shuffled } from '../src/install.ts';
+import { archiveKey, artifactUrl, install, shuffled } from '../src/install.ts';
 import { metadata, mirrorUrl, parseIndex, parseMirrors } from '../src/metadata.ts';
 import { writeJson } from '../src/util.ts';
 
@@ -223,3 +223,76 @@ test('build caches save once, skip read-only and oversized data, and retain loca
     await assert.rejects(saveBuildCache(state, root, store), /symbolic link/);
   }
 });
+
+test('a changed metadata response discards obsolete HTTP validators', async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'setup-zig-validator-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const url = 'https://example.com/index';
+  await writeJson(path.join(root, 'metadata', 'index.json'), {
+    url,
+    body: '{}',
+    fetchedAt: 4000,
+    etag: '"old"',
+    modified: 'old-date',
+  });
+  let requests = 0;
+  const options = {
+    root,
+    url,
+    cache: memoryCache().store,
+    name: 'index',
+    ttl: 1000,
+    now: 5000,
+    fresh: true,
+    parse: JSON.parse,
+    fetch: async (_url: string, headers: Record<string, string>) => {
+      if (requests++ === 0) assert.equal(headers['If-None-Match'], '"old"');
+      else assert.deepEqual(headers, {});
+      return { status: 200, body: '{"changed":true}' };
+    },
+  };
+  await metadata(options);
+  await metadata({ ...options, now: 5500 });
+  assert.equal(requests, 2);
+});
+
+for (const cacheResult of ['partial', 'invalid']) {
+  test(`cleans a ${cacheResult} archive cache before contacting a mirror`, async (t) => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'setup-zig-recovery-'));
+    t.after(() => rm(root, { recursive: true, force: true }));
+    const previousToolCache = process.env.RUNNER_TOOL_CACHE;
+    process.env.RUNNER_TOOL_CACHE = path.join(root, 'tools');
+    t.after(() => {
+      if (previousToolCache === undefined) delete process.env.RUNNER_TOOL_CACHE;
+      else process.env.RUNNER_TOOL_CACHE = previousToolCache;
+    });
+    let archiveDirectory = '';
+    let saved = false;
+    const cache: CacheStore = {
+      restore: async (paths, key) => {
+        const archive = paths[0] ?? '';
+        archiveDirectory = path.dirname(archive);
+        await writeFile(archive, 'incomplete archive');
+        await writeFile(`${archive}.minisig`, 'invalid signature');
+        return cacheResult === 'partial' ? undefined : key;
+      },
+      save: async () => {
+        saved = true;
+      },
+    };
+    await assert.rejects(
+      install({
+        root,
+        release: { version: '0.17.0', filenames: ['zig-x86_64-linux-0.17.0.tar.xz'] },
+        target: { os: 'linux', arch: 'x86_64' },
+        cache,
+        mirrors: async () => {
+          assert.deepEqual(await readdir(archiveDirectory), []);
+          throw new Error('download boundary reached');
+        },
+      }),
+      /download boundary reached/,
+    );
+    assert.equal(saved, false);
+  });
+}
