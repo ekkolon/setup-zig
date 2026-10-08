@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ fromJSON(inputs.full && '["ubuntu-24.04", "ubuntu-24.04-arm", "macos-15", "macos-15-intel", "windows-2025", "windows-11-arm"]' || '["ubuntu-24.04", "macos-15", "windows-2025"]') }}
+        os: ${{ fromJSON((inputs.full || github.head_ref == 'feat/setup-zig') && '["ubuntu-24.04", "ubuntu-24.04-arm", "macos-15", "macos-15-intel", "windows-2025", "windows-11-arm"]' || '["ubuntu-24.04", "macos-15", "windows-2025"]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
@@ -103,7 +103,7 @@ jobs:
       - run: zig test test/fixtures/smoke.zig
 
   versions:
-    if: inputs.full
+    if: (inputs.full || github.head_ref == 'feat/setup-zig')
     needs: check
     runs-on: ubuntu-24.04
     timeout-minutes: 15
