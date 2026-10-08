@@ -781,7 +781,7 @@ async function restoreToolArchive(cachedDirectory, directory, release) {
   );
   return void 0;
 }
-async function restoreActionsArchive(directory, release, cache) {
+async function restoreActionsArchive(directory, release, cache, warn) {
   for (const filename of release.filenames) {
     const archive = path3.join(directory, filename);
     const signature = `${archive}.minisig`;
@@ -797,9 +797,7 @@ async function restoreActionsArchive(directory, release, cache) {
       const sha256 = await verifyArchive(archive, signature, filename, release);
       return { filename, sha256 };
     } catch (error) {
-      warning(
-        `Ignoring invalid Zig archive cache: ${getErrorMessage(error)}`
-      );
+      warn(`Ignoring invalid Zig archive cache: ${getErrorMessage(error)}`);
       await resetDirectory(directory);
     }
   }
@@ -860,7 +858,12 @@ async function installZig(options) {
       }
     }
     if (!verified) {
-      verified = await restoreActionsArchive(directory, release, options.cache);
+      verified = await restoreActionsArchive(
+        directory,
+        release,
+        options.cache,
+        options.onWarning ?? warning
+      );
       if (verified) {
         source = "actions-cache";
       }
@@ -964,7 +967,7 @@ async function readCachedMetadata(options) {
     return result;
   } catch (error) {
     if (saved && options.maxStaleAgeMs && now - saved.fetchedAt < options.maxStaleAgeMs) {
-      warning(
+      (options.onWarning ?? warning)(
         `Could not refresh ${options.name}; using the cached list: ${getErrorMessage(error)}`
       );
       return options.parse(saved.body);

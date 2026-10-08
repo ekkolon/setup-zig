@@ -42,7 +42,11 @@ jobs:
         run: |
           git diff --exit-code -- dist
           test -z "$(git ls-files --others --exclude-standard dist)"
-      - run: pnpm audit --prod --audit-level moderate
+      - name: Validate production SBOM
+        run: |
+          pnpm sbom --sbom-format cyclonedx --sbom-spec-version 1.6 --prod --out "$RUNNER_TEMP/setup-zig.cdx.json"
+          jq -e '.bomFormat == "CycloneDX" and (.components | length >= 7)' "$RUNNER_TEMP/setup-zig.cdx.json"
+      - run: pnpm audit --audit-level moderate
 
   smoke:
     needs: check

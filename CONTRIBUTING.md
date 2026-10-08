@@ -23,8 +23,8 @@ Keep the input surface small. Add a regression test for changes to version resol
 
 ## Releases
 
-1. Update `package.json` and `pnpm-lock.yaml` to the release version. Rebuild `dist/` and merge the change.
-2. Run the **Release** workflow from `main`, with a tag such as `v1.0.0`.
-3. The workflow runs the full test matrix, creates the version tag and GitHub release, then moves the corresponding major tag (for example, `v1`). Existing version tags are never replaced.
+1. Update the version in `package.json`. Refresh the lockfile only if dependencies change; rebuild `dist/` and merge.
+2. Make the repository public, enable immutable releases and private vulnerability reporting, then run the **Release** workflow from `main` with a tag such as `v1.0.0`.
+3. The workflow runs the full test matrix, generates a release archive, CycloneDX SBOM, checksums, and signed attestations, then publishes the immutable version tag and release. The matching major tag (for example, `v1`) advances to the new version.
 
-Before the first public release, make the repository public and enable private vulnerability reporting in repository settings. Publish the action to GitHub Marketplace from the release page if desired. Release tags identify exact revisions; major tags follow compatible updates.
+Verify the release and its assets as described in [Security](SECURITY.md#release-provenance). Publish the action to GitHub Marketplace from the release page if desired. Version tags are immutable; major tags follow compatible updates.
