@@ -82,3 +82,22 @@ test('releases require immutability and attest their archive and SBOM', async ()
   assert.ok(immutabilityCheck > publishScript.indexOf('gh release create'));
   assert.ok(immutabilityCheck < publishScript.indexOf('major='));
 });
+
+
+test('CodeQL checks maintained source rather than generated bundles', async () => {
+  const workflow = parse(
+    await readFile('.github/workflows/codeql.yml', 'utf8'),
+  );
+  const steps = workflow.jobs.analyze.steps;
+  const init = steps.find((step: {uses?: string}) =>
+    step.uses?.startsWith('github/codeql-action/init@'),
+  );
+  const config = parse(init.with.config);
+  assert.deepEqual(config.paths, ['src', 'scripts', 'test']);
+  assert.ok(!config.paths.includes('dist'));
+  assert.ok(
+    steps.some((step: {uses?: string}) =>
+      step.uses?.startsWith('github/codeql-action/analyze@'),
+    ),
+  );
+});

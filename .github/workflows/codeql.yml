@@ -3,9 +3,9 @@ name: CodeQL
 on:
   push:
     branches: [main]
-    paths: ['src/**', 'scripts/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/codeql.yml']
+    paths: ['src/**', 'scripts/**', 'test/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/codeql.yml']
   pull_request:
-    paths: ['src/**', 'scripts/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/codeql.yml']
+    paths: ['src/**', 'scripts/**', 'test/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/codeql.yml']
   workflow_dispatch:
 
 permissions:
@@ -31,11 +31,9 @@ jobs:
         with:
           languages: javascript-typescript
           build-mode: none
+          config: |
+            paths:
+              - src
+              - scripts
+              - test
       - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
-        with:
-          output: codeql-results
-          upload: never
-      - name: Show CodeQL findings (temporary)
-        run: |
-          find codeql-results -name '*.sarif' -type f -print0 |
-            xargs -0 -r jq -r '.runs[] | .results[]? | [.ruleId, (.locations[0].physicalLocation.artifactLocation.uri // ""), ((.locations[0].physicalLocation.region.startLine // 0) | tostring), (.message.text // "")] | @tsv'

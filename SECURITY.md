@@ -31,6 +31,10 @@ gh attestation verify setup-zig-v1.0.0.tar.gz -R ekkolon/setup-zig \
 
 The release also provides `sbom.cdx.json` and `SHA256SUMS`. The `v1` major tag intentionally moves to compatible releases; pin a full action commit SHA or an immutable version tag when evaluating a fixed dependency. Attestations identify the publishing workflow and artifacts, but do not certify that the code is vulnerability-free or compliant with a particular standard.
 
+## Code scanning
+
+CodeQL analyzes maintained source in `src/`, `scripts/`, and `test/`. The generated `dist/` bundles include third-party libraries; CI checks that they reproduce from the lockfile and audits dependencies, including build tools. Review findings in bundled code against their upstream context before treating them as vulnerabilities.
+
 ## Runner and cache trust
 
 GitHub's normal cache access rules apply. Build caches contain unsigned compiler output and packages, so treat them as workflow data. Use `cache: false` for jobs that must rebuild without restored build data. `cache-read-only` prevents this action from uploading caches; it does not make restored data trusted.
