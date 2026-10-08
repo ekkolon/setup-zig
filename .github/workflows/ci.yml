@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/*.md', 'LICENSE', 'docs/**']
+  pull_request:
+    paths-ignore: ['**/*.md', 'LICENSE', 'docs/**']
+  workflow_dispatch:
+    inputs:
+      full:
+        description: Run all six platform and architecture combinations
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      full:
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3
+        with:
+          cache: true
+          require-lockfile: true
+      - run: pnpm run check
+      - name: Check committed bundles
+        run: |
+          git diff --exit-code -- dist
+          test -z "$(git ls-files --others --exclude-standard dist)"
+      - run: pnpm audit --prod --audit-level moderate
+
+  smoke:
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.full && '["ubuntu-24.04", "ubuntu-24.04-arm", "macos-15", "macos-15-intel", "windows-2025", "windows-11-arm"]' || '["ubuntu-24.04", "macos-15", "windows-2025"]') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./
+        id: zig
+        with:
+          version: '0.17.0'
+      - run: zig test test/fixtures/smoke.zig
+      - name: Reuse the runner archive without a working mirror
+        uses: ./
+        id: warm
+        with:
+          version: '0.17.0'
+          mirror: https://unreachable.invalid
+          cache: 'false'
+      - name: Check outputs
+        shell: bash
+        env:
+          VERSION: ${{ steps.zig.outputs.version }}
+          WARM_HIT: ${{ steps.warm.outputs.toolchain-cache-hit }}
+        run: |
+          test "$VERSION" = 0.17.0
+          test "$WARM_HIT" = true
+      - run: zig test test/fixtures/smoke.zig
+
+  restore:
+    needs: smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Restore on a fresh runner without a working mirror
+        uses: ./
+        id: restored
+        with:
+          version: '0.17.0'
+          mirror: https://unreachable.invalid
+          cache-read-only: 'true'
+      - name: Check cache hits
+        env:
+          TOOLCHAIN_HIT: ${{ steps.restored.outputs.toolchain-cache-hit }}
+          BUILD_HIT: ${{ steps.restored.outputs.cache-hit }}
+        run: |
+          test "$TOOLCHAIN_HIT" = true
+          test "$BUILD_HIT" = true
+      - run: zig test test/fixtures/smoke.zig
+
+  versions:
+    if: inputs.full
+    needs: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['0.7.0', '0.13.0', latest, master]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./
+        with:
+          version: ${{ matrix.version }}
+      - run: zig test test/fixtures/smoke.zig
