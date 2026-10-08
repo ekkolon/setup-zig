@@ -3,21 +3,21 @@ import {
   HttpClient,
   __toESM,
   addPath,
-  cacheStore,
   cp,
+  createCacheStore,
   debug,
-  digest,
   exec,
   getBooleanInput,
+  getErrorMessage,
   getExecOutput,
   getInput,
+  hashString,
   info,
-  inside,
   isDebug,
-  message,
+  isPathInside,
+  isRecord,
   mkdirP,
   readJson,
-  record,
   require_semver,
   restoreBuildCache,
   rmRF,
@@ -26,14 +26,22 @@ import {
   warning,
   which,
   writeJson
-} from "./chunk-QPYXBJAQ.js";
+} from "./chunk-XR76OSXA.js";
 
 // src/main.ts
 import path5 from "node:path";
 
 // src/install.ts
 import { randomInt } from "node:crypto";
-import { cp as cp2, lstat, mkdir, mkdtemp, realpath as realpath2, rm as rm2, writeFile } from "node:fs/promises";
+import {
+  cp as cp2,
+  lstat,
+  mkdir,
+  mkdtemp,
+  realpath as realpath2,
+  rm as rm2,
+  writeFile
+} from "node:fs/promises";
 import path3 from "node:path";
 
 // node_modules/@actions/tool-cache/lib/tool-cache.js
@@ -324,15 +332,17 @@ function _getTempDirectory() {
 // src/http.ts
 import { createWriteStream as createWriteStream2 } from "node:fs";
 import { rm } from "node:fs/promises";
-import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
-function httpsUrl(value) {
+function parseHttpsUrl(value) {
   const url = new URL(value);
-  if (url.protocol !== "https:" || url.username || url.password || url.hash)
-    throw new Error("Download URLs must use HTTPS without credentials or fragments.");
+  if (url.protocol !== "https:" || url.username || url.password || url.hash) {
+    throw new Error(
+      "Download URLs must use HTTPS without credentials or fragments."
+    );
+  }
   return url;
 }
-function client(timeout, signal) {
+function createHttpClient(signal) {
   return new HttpClient(
     "ekkolon/setup-zig",
     [
@@ -352,13 +362,13 @@ function client(timeout, signal) {
       allowRetries: false,
       allowRedirectDowngrade: false,
       maxRedirects: 5,
-      socketTimeout: timeout
+      socketTimeout: 3e4
     }
   );
 }
 async function getText(url, headers = {}) {
-  httpsUrl(url);
-  const http = client(3e4, AbortSignal.timeout(45e3));
+  parseHttpsUrl(url);
+  const http = createHttpClient(AbortSignal.timeout(45e3));
   try {
     const response = await http.get(url, headers);
     const status = response.message.statusCode ?? 0;
@@ -376,38 +386,46 @@ async function getText(url, headers = {}) {
       }
       chunks.push(Buffer.from(chunk));
     }
-    const result = { status, body: Buffer.concat(chunks).toString("utf8") };
-    if (response.message.headers.etag) result.etag = response.message.headers.etag;
-    if (response.message.headers["last-modified"])
+    const result = {
+      status,
+      body: Buffer.concat(chunks).toString("utf8")
+    };
+    if (response.message.headers.etag) {
+      result.etag = response.message.headers.etag;
+    }
+    if (response.message.headers["last-modified"]) {
       result.modified = response.message.headers["last-modified"];
+    }
     return result;
   } finally {
     http.dispose();
   }
 }
+async function* limitArchiveSize(source) {
+  let size = 0;
+  for await (const chunk of source) {
+    size += chunk.length;
+    if (size > 512 * 1024 * 1024) {
+      throw new Error("Zig archive exceeds 512 MiB.");
+    }
+    yield chunk;
+  }
+}
 async function download(url, destination) {
-  httpsUrl(url);
+  parseHttpsUrl(url);
   const signal = AbortSignal.timeout(18e4);
-  const http = client(3e4, signal);
+  const http = createHttpClient(signal);
   try {
     const response = await http.get(url);
     if (response.message.statusCode !== 200) {
       response.message.destroy();
-      throw new Error(`HTTP ${response.message.statusCode} from ${new URL(url).host}.`);
+      throw new Error(
+        `HTTP ${response.message.statusCode} from ${new URL(url).host}.`
+      );
     }
-    let size = 0;
-    const limit = new Transform({
-      transform(chunk, _encoding, callback) {
-        size += chunk.length;
-        callback(
-          size > 512 * 1024 * 1024 ? new Error("Zig archive exceeds 512 MiB.") : null,
-          chunk
-        );
-      }
-    });
     await pipeline(
       response.message,
-      limit,
+      limitArchiveSize,
       createWriteStream2(destination, { flags: "wx", mode: 384 }),
       { signal }
     );
@@ -425,24 +443,26 @@ import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
 var ZIG_PUBLIC_KEY = "RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U";
 var ED25519_SPKI = Buffer.from("302a300506032b6570032100", "hex");
-function base64(text, size) {
+function decodeBase64(text, size) {
   const buffer = Buffer.from(text, "base64");
-  if (buffer.length !== size || buffer.toString("base64") !== text)
+  if (buffer.length !== size || buffer.toString("base64") !== text) {
     throw new Error("Malformed minisign data.");
+  }
   return buffer;
 }
-function parseSignature(text, filename, publicKey = ZIG_PUBLIC_KEY) {
+function verifySignatureMetadata(text, filename, publicKey = ZIG_PUBLIC_KEY) {
   const lines = text.trimEnd().split(/\r?\n/);
   if (lines.length !== 4 || !lines[0]?.startsWith("untrusted comment: ") || !lines[2]?.startsWith("trusted comment: ")) {
     throw new Error("Malformed minisign signature.");
   }
-  const key = base64(publicKey, 42);
-  const packet = base64(lines[1] ?? "", 74);
+  const key = decodeBase64(publicKey, 42);
+  const packet = decodeBase64(lines[1] ?? "", 74);
   if (key.subarray(0, 2).toString() !== "Ed" || packet.subarray(0, 2).toString() !== "ED") {
     throw new Error("Expected a prehashed Ed25519 minisign signature.");
   }
-  if (!key.subarray(2, 10).equals(packet.subarray(2, 10)))
+  if (!key.subarray(2, 10).equals(packet.subarray(2, 10))) {
     throw new Error("The archive was not signed with the Zig release key.");
+  }
   const publicKeyObject = createPublicKey({
     key: Buffer.concat([ED25519_SPKI, key.subarray(10)]),
     format: "der",
@@ -454,39 +474,47 @@ function parseSignature(text, filename, publicKey = ZIG_PUBLIC_KEY) {
     null,
     Buffer.concat([signature, Buffer.from(comment)]),
     publicKeyObject,
-    base64(lines[3] ?? "", 64)
+    decodeBase64(lines[3] ?? "", 64)
   )) {
     throw new Error("Invalid minisign trusted-comment signature.");
   }
-  const names = [...comment.matchAll(/(?:^|\s)file:([^\s]+)/g)].map((match) => match[1]);
-  if (names.length !== 1 || names[0] !== filename)
+  const names = [...comment.matchAll(/(?:^|\s)file:([^\s]+)/g)].map(
+    (match) => match[1]
+  );
+  if (names.length !== 1 || names[0] !== filename) {
     throw new Error(
       "Signed archive filename does not match the requested Zig version and platform."
     );
+  }
   return { signature, key: publicKeyObject };
 }
-async function verifyArchive(archive, signatureFile, filename, expectedSha256, expectedSize, publicKey = ZIG_PUBLIC_KEY) {
-  const { signature, key } = parseSignature(
+async function verifyArchive(archive, signatureFile, filename, checks = {}) {
+  const { signature, key } = verifySignatureMetadata(
     await readFile(signatureFile, "utf8"),
     filename,
-    publicKey
+    checks.publicKey
   );
-  const blake = createHash("blake2b512");
-  const sha = createHash("sha256");
+  const prehash = createHash("blake2b512");
+  const sha256 = createHash("sha256");
   let size = 0;
   for await (const chunk of createReadStream(archive)) {
     size += chunk.length;
-    if (size > 512 * 1024 * 1024) throw new Error("Zig archive exceeds 512 MiB.");
-    blake.update(chunk);
-    sha.update(chunk);
+    if (size > 512 * 1024 * 1024) {
+      throw new Error("Zig archive exceeds 512 MiB.");
+    }
+    prehash.update(chunk);
+    sha256.update(chunk);
   }
-  if (expectedSize !== void 0 && size !== expectedSize)
+  if (checks.size !== void 0 && size !== checks.size) {
     throw new Error("Zig archive size does not match the download index.");
-  const checksum = sha.digest("hex");
-  if (expectedSha256 && checksum !== expectedSha256)
+  }
+  const checksum = sha256.digest("hex");
+  if (checks.sha256 && checksum !== checks.sha256) {
     throw new Error("Zig archive SHA-256 mismatch.");
-  if (!verify(null, blake.digest(), key, signature))
+  }
+  if (!verify(null, prehash.digest(), key, signature)) {
     throw new Error("Zig archive minisign verification failed.");
+  }
   return checksum;
 }
 
@@ -494,31 +522,52 @@ async function verifyArchive(archive, signatureFile, filename, expectedSha256, e
 var import_semver = __toESM(require_semver(), 1);
 import { readFile as readFile2, realpath, stat } from "node:fs/promises";
 import path2 from "node:path";
-var exactVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-dev\.(0|[1-9]\d*)\+[a-f0-9]{7,40})?$/;
-function parseRequest(value) {
+var EXACT_VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-dev\.(0|[1-9]\d*)\+[a-f0-9]{7,40})?$/;
+var OPERATING_SYSTEMS = /* @__PURE__ */ new Map([
+  ["linux", "linux"],
+  ["darwin", "macos"],
+  ["win32", "windows"]
+]);
+var ARCHITECTURES = /* @__PURE__ */ new Map([
+  ["x64", "x86_64"],
+  ["x86_64", "x86_64"],
+  ["arm64", "aarch64"],
+  ["aarch64", "aarch64"],
+  ["x86", "x86"],
+  ["ia32", "x86"]
+]);
+function parseVersionRequest(value) {
   const input = value.trim().replace(/^v(?=\d)/, "");
-  if (input.length > 200 || /[\r\n\0]/.test(input)) throw new Error("Invalid Zig version.");
-  if (input === "master") return { kind: "master", value: input };
-  if (exactVersion.test(input)) {
-    if (import_semver.default.lt(input, "0.7.0")) throw new Error("Zig 0.7.0 or newer is required.");
+  if (input.length > 200 || /[\r\n\0]/.test(input)) {
+    throw new Error("Invalid Zig version.");
+  }
+  if (input === "master") {
+    return { kind: "master", value: input };
+  }
+  if (EXACT_VERSION.test(input)) {
+    if (import_semver.default.lt(input, "0.7.0")) {
+      throw new Error("Zig 0.7.0 or newer is required.");
+    }
     return { kind: "exact", value: input };
   }
-  if (input === "latest") return { kind: "range", value: "*" };
-  if (/^\d+\.\d+\.\d+-/.test(input))
-    throw new Error("A Zig development version must include its complete commit hash.");
-  if (input && import_semver.default.validRange(input)) return { kind: "range", value: input };
-  throw new Error(`Invalid Zig version "${value}". Use a release, range, or master.`);
+  if (input === "latest") {
+    return { kind: "range", value: "*" };
+  }
+  if (/^\d+\.\d+\.\d+-/.test(input)) {
+    throw new Error(
+      "A Zig development version must include its complete commit hash."
+    );
+  }
+  if (input && import_semver.default.validRange(input)) {
+    return { kind: "range", value: input };
+  }
+  throw new Error(
+    `Invalid Zig version "${value}". Use a release, range, or master.`
+  );
 }
-function platform(os2, arch2) {
-  const operatingSystem = { linux: "linux", darwin: "macos", win32: "windows" }[os2];
-  const architecture = {
-    x64: "x86_64",
-    x86_64: "x86_64",
-    arm64: "aarch64",
-    aarch64: "aarch64",
-    x86: "x86",
-    ia32: "x86"
-  }[arch2];
+function resolvePlatform(os2, arch2) {
+  const operatingSystem = OPERATING_SYSTEMS.get(os2);
+  const architecture = ARCHITECTURES.get(arch2);
   if (!operatingSystem || !architecture || operatingSystem === "macos" && architecture === "x86") {
     throw new Error(
       `Unsupported Zig platform: ${os2}/${arch2}. Use Linux, macOS, or Windows with x64 or arm64 (x86 on Linux/Windows).`
@@ -526,132 +575,180 @@ function platform(os2, arch2) {
   }
   return { os: operatingSystem, arch: architecture };
 }
-function filenames(version, target) {
-  if (parseRequest(version).kind !== "exact") throw new Error("Expected an exact Zig version.");
+function getArchiveFilenames(version, target) {
+  if (parseVersionRequest(version).kind !== "exact") {
+    throw new Error("Expected an exact Zig version.");
+  }
   const extension = target.os === "windows" ? "zip" : "tar.xz";
   const current = `zig-${target.arch}-${target.os}-${version}.${extension}`;
   const legacy = `zig-${target.os}-${target.arch}-${version}.${extension}`;
-  if (version.startsWith("0.15.0-dev.")) return [current, legacy];
+  if (version.startsWith("0.15.0-dev.")) {
+    return [current, legacy];
+  }
   return [import_semver.default.lt(version, "0.14.1") ? legacy : current];
 }
-function resolveIndex(index, request, target) {
-  if (!record(index)) throw new Error("Zig download index is not an object.");
-  const version = request.kind === "master" ? record(index.master) && typeof index.master.version === "string" ? index.master.version : "" : import_semver.default.maxSatisfying(
-    Object.keys(index).filter((v) => exactVersion.test(v) && !v.includes("-")),
-    request.value
-  );
-  if (!version) throw new Error(`No published Zig release matches "${request.value}".`);
-  if (parseRequest(version).kind !== "exact")
+function resolveReleaseFromIndex(index, request, target) {
+  if (!isRecord(index)) {
+    throw new Error("Zig download index is not an object.");
+  }
+  let version = null;
+  if (request.kind === "master") {
+    if (isRecord(index.master) && typeof index.master.version === "string") {
+      version = index.master.version;
+    }
+  } else {
+    const releases = Object.keys(index).filter(
+      (candidate) => EXACT_VERSION.test(candidate) && !candidate.includes("-")
+    );
+    version = import_semver.default.maxSatisfying(releases, request.value);
+  }
+  if (!version) {
+    throw new Error(`No published Zig release matches "${request.value}".`);
+  }
+  if (parseVersionRequest(version).kind !== "exact") {
     throw new Error("Zig index contains an invalid version.");
+  }
   const entry = index[request.kind === "master" ? "master" : version];
-  const artifact = record(entry) ? entry[`${target.arch}-${target.os}`] : void 0;
-  if (!record(artifact) || typeof artifact.tarball !== "string" || typeof artifact.shasum !== "string" || !/^[a-f0-9]{64}$/.test(artifact.shasum)) {
-    throw new Error(`Zig ${version} has no valid archive for ${target.os}/${target.arch}.`);
+  const artifact = isRecord(entry) ? entry[`${target.arch}-${target.os}`] : void 0;
+  if (!isRecord(artifact) || typeof artifact.tarball !== "string" || typeof artifact.shasum !== "string" || !/^[a-f0-9]{64}$/.test(artifact.shasum)) {
+    throw new Error(
+      `Zig ${version} has no valid archive for ${target.os}/${target.arch}.`
+    );
   }
   const url = new URL(artifact.tarball);
   const filename = path2.posix.basename(url.pathname);
-  if (url.origin !== "https://ziglang.org" || !filenames(version, target).includes(filename)) {
+  if (url.origin !== "https://ziglang.org" || !getArchiveFilenames(version, target).includes(filename)) {
     throw new Error("Zig index contains an unexpected archive URL.");
   }
   const size = Number(artifact.size);
-  if (!Number.isSafeInteger(size) || size < 1 || size > 512 * 1024 * 1024)
+  if (!Number.isSafeInteger(size) || size < 1 || size > 512 * 1024 * 1024) {
     throw new Error("Zig index contains an invalid archive size.");
+  }
   return { version, filenames: [filename], sha256: artifact.shasum, size };
 }
-function toolVersion(version) {
+function toToolCacheVersion(version) {
   return version.replace("+", ".build.");
 }
-function versionFromText(text, filename) {
+function parseVersionFile(text, filename) {
   const name = path2.basename(filename);
   if (name === ".tool-versions") {
     const matches = text.split(/\r?\n/).map((line) => line.replace(/#.*/, "").trim()).filter((line) => /^zig\s/.test(line));
-    if (matches.length !== 1) throw new Error(".tool-versions must contain exactly one Zig entry.");
+    if (matches.length !== 1) {
+      throw new Error(".tool-versions must contain exactly one Zig entry.");
+    }
     const parts = matches[0]?.split(/\s+/) ?? [];
-    if (parts.length !== 2 || !parts[1])
+    if (parts.length !== 2 || !parts[1]) {
       throw new Error("Specify one Zig version in .tool-versions.");
+    }
     return parts[1];
   }
-  if (name === "build.zig.zon") return minimumZigVersion(text);
+  if (name === "build.zig.zon") {
+    return parseMinimumZigVersion(text);
+  }
   const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
-  if (lines.length !== 1 || !lines[0])
+  if (lines.length !== 1 || !lines[0]) {
     throw new Error("A version file must contain one version or range.");
+  }
   return lines[0];
 }
-function minimumZigVersion(text) {
-  const tokens = (text.match(/\/\/[^\r\n]*|\\\\[^\r\n]*|"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g) ?? []).filter((token) => !token.startsWith("//"));
+function parseMinimumZigVersion(text) {
+  const tokens = (text.match(
+    /\/\/[^\r\n]*|\\\\[^\r\n]*|"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[^\s]/g
+  ) ?? []).filter((token) => !token.startsWith("//"));
   let depth = 0;
   const versions = [];
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
-    if (token === "{") depth++;
-    if (token === "}") depth--;
-    if (depth === 1 && token === "." && tokens[i + 1] === "minimum_zig_version" && tokens[i + 2] === "=") {
-      const value = tokens[i + 3];
-      if (!value || !/^"[0-9A-Za-z.+-]+"$/.test(value))
-        throw new Error("minimum_zig_version must be a literal version string.");
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+    if (token === "{") {
+      depth++;
+    }
+    if (token === "}") {
+      depth--;
+    }
+    if (depth === 1 && token === "." && tokens[index + 1] === "minimum_zig_version" && tokens[index + 2] === "=") {
+      const value = tokens[index + 3];
+      if (!value || !/^"[0-9A-Za-z.+-]+"$/.test(value)) {
+        throw new Error(
+          "minimum_zig_version must be a literal version string."
+        );
+      }
       versions.push(value.slice(1, -1));
     }
   }
-  if (versions.length !== 1 || !versions[0])
-    throw new Error("build.zig.zon must contain one top-level minimum_zig_version.");
-  if (parseRequest(versions[0]).kind !== "exact")
+  if (versions.length !== 1 || !versions[0]) {
+    throw new Error(
+      "build.zig.zon must contain one top-level minimum_zig_version."
+    );
+  }
+  if (parseVersionRequest(versions[0]).kind !== "exact") {
     throw new Error("minimum_zig_version must be an exact version.");
+  }
   return versions[0];
 }
 async function readVersionFile(workspace, filename) {
   const root = await realpath(workspace);
   const resolved = await realpath(path2.resolve(root, filename));
-  if (!inside(root, resolved)) throw new Error("version-file must be inside the workspace.");
-  if ((await stat(resolved)).size > 1024 * 1024) throw new Error("version-file exceeds 1 MiB.");
-  return versionFromText(await readFile2(resolved, "utf8"), filename);
+  if (!isPathInside(root, resolved)) {
+    throw new Error("version-file must be inside the workspace.");
+  }
+  if ((await stat(resolved)).size > 1024 * 1024) {
+    throw new Error("version-file exceeds 1 MiB.");
+  }
+  return parseVersionFile(await readFile2(resolved, "utf8"), filename);
 }
 
 // src/install.ts
-function shuffled(items) {
+function shuffle(items) {
   const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = randomInt(i + 1);
-    const current = result[i];
-    const replacement = result[j];
+  for (let index = result.length - 1; index > 0; index--) {
+    const replacementIndex = randomInt(index + 1);
+    const current = result[index];
+    const replacement = result[replacementIndex];
     if (current !== void 0 && replacement !== void 0) {
-      result[i] = replacement;
-      result[j] = current;
+      result[index] = replacement;
+      result[replacementIndex] = current;
     }
   }
   return result;
 }
-function archiveKey(filename) {
-  return `setup-zig-archive-v1-${digest(`${ZIG_PUBLIC_KEY}
+function getArchiveCacheKey(filename) {
+  return `setup-zig-archive-v1-${hashString(`${ZIG_PUBLIC_KEY}
 ${filename}`)}-end`;
 }
-function artifactUrl(mirror, filename) {
+function getArtifactUrl(mirror, filename) {
   const url = new URL(`${mirror}/${filename}`);
   url.searchParams.set("source", "github-ekkolon-setup-zig");
   return url.href;
 }
+async function resetDirectory(directory) {
+  await rm2(directory, { recursive: true, force: true });
+  await mkdir(directory, { recursive: true });
+}
 async function downloadArchive(directory, release, mirrors) {
   const failures = [];
-  for (const mirror of shuffled(mirrors).slice(0, 5)) {
+  for (const mirror of shuffle(mirrors).slice(0, 5)) {
     for (const filename of release.filenames) {
       const archive = path3.join(directory, filename);
       const signature = `${archive}.minisig`;
       try {
         info(`Downloading ${filename} from ${new URL(mirror).host}`);
-        const response = await getText(artifactUrl(mirror, `${filename}.minisig`));
-        parseSignature(response.body, filename);
+        const response = await getText(
+          getArtifactUrl(mirror, `${filename}.minisig`)
+        );
+        verifySignatureMetadata(response.body, filename);
         await writeFile(signature, response.body, { mode: 384 });
-        await download(artifactUrl(mirror, filename), archive);
+        await download(getArtifactUrl(mirror, filename), archive);
         const sha256 = await verifyArchive(
           archive,
           signature,
           filename,
-          release.sha256,
-          release.size
+          release
         );
         return { filename, sha256 };
       } catch (error) {
-        failures.push(`${new URL(mirror).host}: ${message(error)}`);
-        warning(`Mirror failed: ${failures.at(-1)}`);
+        const failure = `${new URL(mirror).host}: ${getErrorMessage(error)}`;
+        failures.push(failure);
+        warning(`Mirror failed: ${failure}`);
         await rm2(archive, { force: true });
         await rm2(signature, { force: true });
       }
@@ -659,104 +756,146 @@ async function downloadArchive(directory, release, mirrors) {
   }
   throw new Error(
     `Could not download verified Zig ${release.version}. Older development builds may no longer be available. Try again or set mirror to an available HTTPS mirror.
-${failures.join("\n")}`
+` + failures.join("\n")
   );
 }
-async function install(options) {
-  const { root, release, target } = options;
-  const id = digest(`${target.os}/${target.arch}/${release.version}`);
-  const directory = path3.join(root, "archives", id);
-  await rm2(directory, { recursive: true, force: true });
-  await mkdir(directory, { recursive: true });
-  let source = "download";
-  let found;
-  const tool = `zig-archive-v1-${digest(ZIG_PUBLIC_KEY).slice(0, 16)}`;
-  const arch2 = `${target.os}-${target.arch}`;
-  const local = process.env.RUNNER_TOOL_CACHE ? find(tool, toolVersion(release.version), arch2) : "";
-  if (local) {
-    for (const filename of release.filenames) {
-      try {
-        const sha256 = await verifyArchive(
-          path3.join(local, filename),
-          path3.join(local, `${filename}.minisig`),
-          filename,
-          release.sha256,
-          release.size
-        );
-        await cp2(path3.join(local, filename), path3.join(directory, filename));
-        await cp2(
-          path3.join(local, `${filename}.minisig`),
-          path3.join(directory, `${filename}.minisig`)
-        );
-        found = { filename, sha256 };
-        source = "tool-cache";
-        break;
-      } catch (error) {
-        debug(`Local archive cache miss: ${message(error)}`);
-      }
-    }
-    if (!found)
-      warning(
-        "The runner tool cache contains an invalid Zig archive; downloading a verified copy."
-      );
-  }
-  if (!found) {
-    for (const filename of release.filenames) {
-      const paths = [path3.join(directory, filename), path3.join(directory, `${filename}.minisig`)];
-      const key = archiveKey(filename);
-      const hit = await options.cache.restore(paths, key);
-      if (!hit) continue;
-      try {
-        if (hit !== key) throw new Error("Unexpected archive cache key.");
-        const sha256 = await verifyArchive(
-          paths[0] ?? "",
-          paths[1] ?? "",
-          filename,
-          release.sha256,
-          release.size
-        );
-        found = { filename, sha256 };
-        source = "actions-cache";
-        break;
-      } catch (error) {
-        warning(`Ignoring invalid Zig archive cache: ${message(error)}`);
-        await rm2(directory, { recursive: true, force: true });
-        await mkdir(directory, { recursive: true });
-      }
-    }
-  }
-  if (!found) {
-    await rm2(directory, { recursive: true, force: true });
-    await mkdir(directory, { recursive: true });
-    found = await downloadArchive(directory, release, await options.mirrors());
-    const archive2 = path3.join(directory, found.filename);
-    await options.cache.save([archive2, `${archive2}.minisig`], archiveKey(found.filename));
-  }
-  if (source !== "tool-cache" && process.env.RUNNER_TOOL_CACHE) {
+async function restoreToolArchive(cachedDirectory, directory, release) {
+  for (const filename of release.filenames) {
+    const archive = path3.join(cachedDirectory, filename);
+    const signature = `${archive}.minisig`;
     try {
-      await cacheDir(directory, tool, toolVersion(release.version), arch2);
+      const sha256 = await verifyArchive(archive, signature, filename, release);
+      await cp2(archive, path3.join(directory, filename));
+      await cp2(signature, path3.join(directory, `${filename}.minisig`));
+      return { filename, sha256 };
     } catch (error) {
-      warning(`Could not populate the runner tool cache: ${message(error)}`);
+      debug(`Local archive cache miss: ${getErrorMessage(error)}`);
     }
   }
+  warning(
+    "The runner tool cache contains an invalid Zig archive; downloading a verified copy."
+  );
+  return void 0;
+}
+async function restoreActionsArchive(directory, release, cache) {
+  for (const filename of release.filenames) {
+    const archive = path3.join(directory, filename);
+    const signature = `${archive}.minisig`;
+    const key = getArchiveCacheKey(filename);
+    const hit = await cache.restore([archive, signature], key);
+    if (!hit) {
+      continue;
+    }
+    try {
+      if (hit !== key) {
+        throw new Error("Unexpected archive cache key.");
+      }
+      const sha256 = await verifyArchive(archive, signature, filename, release);
+      return { filename, sha256 };
+    } catch (error) {
+      warning(
+        `Ignoring invalid Zig archive cache: ${getErrorMessage(error)}`
+      );
+      await resetDirectory(directory);
+    }
+  }
+  return void 0;
+}
+async function extractArchive(archive, root, release, target) {
   const stagingRoot = path3.join(root, "installations");
   await mkdir(stagingRoot, { recursive: true });
   const staging = await mkdtemp(path3.join(stagingRoot, "zig-"));
-  const archive = path3.join(directory, found.filename);
   try {
-    if (target.os === "windows") await extractZip(archive, staging);
-    else await extractTar(archive, staging, ["xJ", "--no-same-owner"]);
-    const extracted = path3.join(staging, found.filename.replace(/\.(tar\.xz|zip)$/, ""));
-    const executable = path3.join(extracted, target.os === "windows" ? "zig.exe" : "zig");
-    if (!(await lstat(executable)).isFile() || !inside(staging, await realpath2(executable)))
+    if (target.os === "windows") {
+      await extractZip(archive, staging);
+    } else {
+      await extractTar(archive, staging, ["xJ", "--no-same-owner"]);
+    }
+    const directory = path3.join(
+      staging,
+      path3.basename(archive).replace(/\.(tar\.xz|zip)$/, "")
+    );
+    const executable = path3.join(
+      directory,
+      target.os === "windows" ? "zig.exe" : "zig"
+    );
+    if (!(await lstat(executable)).isFile() || !isPathInside(staging, await realpath2(executable))) {
       throw new Error("The Zig archive has an unexpected layout.");
-    const result = await getExecOutput(executable, ["version"], { silent: true });
-    if (result.stdout.trim() !== release.version)
-      throw new Error(`Expected Zig ${release.version}, received ${result.stdout.trim()}.`);
-    return { directory: extracted, source, sha256: found.sha256 };
+    }
+    const result = await getExecOutput(executable, ["version"], {
+      silent: true
+    });
+    const version = result.stdout.trim();
+    if (version !== release.version) {
+      throw new Error(`Expected Zig ${release.version}, received ${version}.`);
+    }
+    return directory;
   } catch (error) {
     await rm2(staging, { recursive: true, force: true });
     throw error;
+  }
+}
+async function installZig(options) {
+  const { root, release, target } = options;
+  const archiveId = hashString(
+    `${target.os}/${target.arch}/${release.version}`
+  );
+  const directory = path3.join(root, "archives", archiveId);
+  await resetDirectory(directory);
+  try {
+    const toolName = `zig-archive-v1-${hashString(ZIG_PUBLIC_KEY).slice(0, 16)}`;
+    const cacheVersion = toToolCacheVersion(release.version);
+    const cachePlatform = `${target.os}-${target.arch}`;
+    const cachedDirectory = process.env.RUNNER_TOOL_CACHE ? find(toolName, cacheVersion, cachePlatform) : "";
+    let source = "download";
+    let verified;
+    if (cachedDirectory) {
+      verified = await restoreToolArchive(cachedDirectory, directory, release);
+      if (verified) {
+        source = "tool-cache";
+      }
+    }
+    if (!verified) {
+      verified = await restoreActionsArchive(directory, release, options.cache);
+      if (verified) {
+        source = "actions-cache";
+      }
+    }
+    if (!verified) {
+      await resetDirectory(directory);
+      verified = await downloadArchive(
+        directory,
+        release,
+        await options.getMirrors()
+      );
+      const archive2 = path3.join(directory, verified.filename);
+      await options.cache.save(
+        [archive2, `${archive2}.minisig`],
+        getArchiveCacheKey(verified.filename)
+      );
+    }
+    if (source !== "tool-cache" && process.env.RUNNER_TOOL_CACHE) {
+      try {
+        await cacheDir(
+          directory,
+          toolName,
+          cacheVersion,
+          cachePlatform
+        );
+      } catch (error) {
+        warning(
+          `Could not populate the runner tool cache: ${getErrorMessage(error)}`
+        );
+      }
+    }
+    const archive = path3.join(directory, verified.filename);
+    const installedDirectory = await extractArchive(
+      archive,
+      root,
+      release,
+      target
+    );
+    return { directory: installedDirectory, source, sha256: verified.sha256 };
   } finally {
     await rm2(directory, { recursive: true, force: true });
   }
@@ -766,136 +905,180 @@ async function install(options) {
 import path4 from "node:path";
 var INDEX_URL = "https://ziglang.org/download/index.json";
 var MIRRORS_URL = "https://ziglang.org/download/community-mirrors.txt";
-function snapshot(value, url, now) {
-  return record(value) && value.url === url && typeof value.body === "string" && value.body.length <= 1024 * 1024 && typeof value.fetchedAt === "number" && value.fetchedAt > 0 && value.fetchedAt <= now && (value.etag === void 0 || typeof value.etag === "string") && (value.modified === void 0 || typeof value.modified === "string");
+function isSnapshot(value, url, now) {
+  return isRecord(value) && value.url === url && typeof value.body === "string" && value.body.length <= 1024 * 1024 && typeof value.fetchedAt === "number" && value.fetchedAt > 0 && value.fetchedAt <= now && (value.etag === void 0 || typeof value.etag === "string") && (value.modified === void 0 || typeof value.modified === "string");
 }
-async function metadata(options) {
+async function readSnapshot(file, options, now) {
+  try {
+    const data = await readJson(file);
+    if (isSnapshot(data, options.url, now)) {
+      options.parse(data.body);
+      return data;
+    }
+  } catch {
+  }
+  return void 0;
+}
+async function readCachedMetadata(options) {
   const now = options.now ?? Date.now();
   const file = path4.join(options.root, "metadata", `${options.name}.json`);
   const prefix = `setup-zig-metadata-v1-${options.name}-`;
-  const key = `${prefix}${Math.floor(now / options.ttl)}-end`;
-  let saved;
-  const load = async () => {
-    try {
-      const data = await readJson(file);
-      if (snapshot(data, options.url, now)) {
-        options.parse(data.body);
-        return data;
-      }
-    } catch {
-    }
-    return void 0;
-  };
-  saved = await load();
+  const key = `${prefix}${Math.floor(now / options.ttlMs)}-end`;
+  let saved = await readSnapshot(file, options, now);
   if (!saved) {
     await options.cache.restore([file], key, [prefix]);
-    saved = await load();
+    saved = await readSnapshot(file, options, now);
   }
-  if (saved && !options.fresh && now - saved.fetchedAt < options.ttl)
+  if (saved && !options.forceRefresh && now - saved.fetchedAt < options.ttlMs) {
     return options.parse(saved.body);
+  }
   const headers = {};
-  if (saved?.etag) headers["If-None-Match"] = saved.etag;
-  if (saved?.modified) headers["If-Modified-Since"] = saved.modified;
+  if (saved?.etag) {
+    headers["If-None-Match"] = saved.etag;
+  }
+  if (saved?.modified) {
+    headers["If-Modified-Since"] = saved.modified;
+  }
   try {
-    const response = await (options.fetch ?? getText)(options.url, headers);
-    if (response.status !== 200 && !(response.status === 304 && saved))
+    const response = await (options.fetchText ?? getText)(options.url, headers);
+    if (response.status !== 200 && !(response.status === 304 && saved)) {
       throw new Error("Unexpected metadata response.");
+    }
     const body = response.status === 304 && saved ? saved.body : response.body;
     const result = options.parse(body);
     const next = { url: options.url, fetchedAt: now, body };
     const etag = response.etag ?? (response.status === 304 ? saved?.etag : void 0);
     const modified = response.modified ?? (response.status === 304 ? saved?.modified : void 0);
-    if (etag) next.etag = etag;
-    if (modified) next.modified = modified;
+    if (etag) {
+      next.etag = etag;
+    }
+    if (modified) {
+      next.modified = modified;
+    }
     await writeJson(file, next);
     await options.cache.save([file], key);
     return result;
   } catch (error) {
-    if (saved && options.staleFor && now - saved.fetchedAt < options.staleFor) {
-      warning(`Could not refresh ${options.name}; using the cached list: ${message(error)}`);
+    if (saved && options.maxStaleAgeMs && now - saved.fetchedAt < options.maxStaleAgeMs) {
+      warning(
+        `Could not refresh ${options.name}; using the cached list: ${getErrorMessage(error)}`
+      );
       return options.parse(saved.body);
     }
-    throw new Error(`Could not fetch Zig ${options.name}: ${message(error)}`);
+    throw new Error(
+      `Could not fetch Zig ${options.name}: ${getErrorMessage(error)}`
+    );
   }
 }
 function parseIndex(text) {
   const value = JSON.parse(text);
-  if (!record(value) || !record(value.master)) throw new Error("Invalid Zig download index.");
+  if (!isRecord(value) || !isRecord(value.master)) {
+    throw new Error("Invalid Zig download index.");
+  }
   return value;
 }
-function mirrorUrl(value) {
-  const url = httpsUrl(value);
-  if (url.search || /(^|\.)ziglang\.org$/i.test(url.hostname))
+function parseMirrorUrl(value) {
+  const url = parseHttpsUrl(value);
+  if (url.search || /(^|\.)ziglang\.org$/i.test(url.hostname)) {
     throw new Error("Use a community mirror URL without a query string.");
+  }
   return url.href.replace(/\/$/, "");
 }
 function parseMirrors(text) {
-  const lines = text.trim().split(/\r?\n/).map((line) => mirrorUrl(line.trim()));
-  if (lines.length < 1 || lines.length > 100) throw new Error("Invalid community mirror list.");
+  const lines = text.trim().split(/\r?\n/).map((line) => parseMirrorUrl(line.trim()));
+  if (lines.length < 1 || lines.length > 100) {
+    throw new Error("Invalid community mirror list.");
+  }
   return [...new Set(lines)];
 }
 
 // src/main.ts
 async function run() {
-  const temporary = process.env.RUNNER_TEMP;
-  if (!temporary) throw new Error("RUNNER_TEMP is not set. Run setup-zig in a GitHub Actions job.");
-  const root = path5.join(temporary, "setup-zig-v1");
+  const runnerTemp = process.env.RUNNER_TEMP;
+  if (!runnerTemp) {
+    throw new Error(
+      "RUNNER_TEMP is not set. Run setup-zig in a GitHub Actions job."
+    );
+  }
+  const root = path5.join(runnerTemp, "setup-zig-v1");
   const workspace = process.env.GITHUB_WORKSPACE ?? process.cwd();
-  const versionInput = getInput("version");
+  let versionInput = getInput("version");
   const versionFile = getInput("version-file");
-  if (versionInput && versionFile) warning("version takes precedence over version-file.");
-  const request = parseRequest(
-    versionInput || (versionFile ? await readVersionFile(workspace, versionFile) : "latest")
+  if (versionInput && versionFile) {
+    warning("version takes precedence over version-file.");
+  }
+  if (!versionInput) {
+    versionInput = versionFile ? await readVersionFile(workspace, versionFile) : "latest";
+  }
+  const request = parseVersionRequest(versionInput);
+  const target = resolvePlatform(
+    process.platform,
+    getInput("architecture") || process.arch
   );
-  const target = platform(process.platform, getInput("architecture") || process.arch);
   const checksum = getInput("checksum").toLowerCase();
-  if (checksum && !/^[a-f0-9]{64}$/.test(checksum))
-    throw new Error("checksum must be a SHA-256 digest (64 hexadecimal characters).");
+  if (checksum && !/^[a-f0-9]{64}$/.test(checksum)) {
+    throw new Error(
+      "checksum must be a SHA-256 digest (64 hexadecimal characters)."
+    );
+  }
   const customMirror = getInput("mirror");
-  const mirror = customMirror ? mirrorUrl(customMirror) : "";
+  const mirror = customMirror ? parseMirrorUrl(customMirror) : "";
   const readOnly = getBooleanInput("cache-read-only");
-  const toolCache = cacheStore(getBooleanInput("cache-toolchain"), readOnly);
+  const toolchainCache = createCacheStore(
+    getBooleanInput("cache-toolchain"),
+    readOnly
+  );
   const useBuildCache = getBooleanInput("cache");
-  const maxMiB = Number(getInput("cache-size-limit"));
-  if (!Number.isSafeInteger(maxMiB) || maxMiB < 1 || maxMiB > 10240)
+  const cacheSizeLimitMib = Number(getInput("cache-size-limit"));
+  if (!Number.isSafeInteger(cacheSizeLimitMib) || cacheSizeLimitMib < 1 || cacheSizeLimitMib > 10240) {
     throw new Error("cache-size-limit must be between 1 and 10240 MiB.");
+  }
   let release;
-  if (request.kind === "exact")
-    release = { version: request.value, filenames: filenames(request.value, target) };
-  else {
-    const index = await metadata({
+  if (request.kind === "exact") {
+    release = {
+      version: request.value,
+      filenames: getArchiveFilenames(request.value, target)
+    };
+  } else {
+    const index = await readCachedMetadata({
       name: "index",
       url: INDEX_URL,
-      ttl: 60 * 60 * 1e3,
+      ttlMs: 60 * 60 * 1e3,
       root,
-      cache: toolCache,
+      cache: toolchainCache,
       parse: parseIndex,
-      fresh: getBooleanInput("check-latest")
+      forceRefresh: getBooleanInput("check-latest")
     });
-    release = resolveIndex(index, request, target);
+    release = resolveReleaseFromIndex(index, request, target);
   }
   if (checksum) {
-    if (release.sha256 && checksum !== release.sha256)
+    if (release.sha256 && checksum !== release.sha256) {
       throw new Error("checksum does not match the Zig download index.");
+    }
     release.sha256 = checksum;
   }
-  const installed = await install({
+  const installation = await installZig({
     root,
     release,
     target,
-    cache: toolCache,
-    mirrors: async () => mirror ? [mirror] : metadata({
-      name: "mirrors",
-      url: MIRRORS_URL,
-      ttl: 24 * 60 * 60 * 1e3,
-      staleFor: 7 * 24 * 60 * 60 * 1e3,
-      root,
-      cache: toolCache,
-      parse: parseMirrors
-    })
+    cache: toolchainCache,
+    getMirrors: async () => {
+      if (mirror) {
+        return [mirror];
+      }
+      return readCachedMetadata({
+        name: "mirrors",
+        url: MIRRORS_URL,
+        ttlMs: 24 * 60 * 60 * 1e3,
+        maxStaleAgeMs: 7 * 24 * 60 * 60 * 1e3,
+        root,
+        cache: toolchainCache,
+        parse: parseMirrors
+      });
+    }
   });
   let cacheHit = false;
-  let globalCache = process.env.ZIG_GLOBAL_CACHE_DIR ?? "";
+  let globalCacheDirectory = process.env.ZIG_GLOBAL_CACHE_DIR ?? "";
   if (useBuildCache) {
     const restored = await restoreBuildCache({
       root,
@@ -904,23 +1087,22 @@ async function run() {
       scope: getInput("cache-key"),
       dependencyPath: getInput("cache-dependency-path"),
       workspace,
-      maxBytes: maxMiB * 1024 * 1024,
+      maxBytes: cacheSizeLimitMib * 1024 * 1024,
       readOnly,
-      cache: cacheStore(true, readOnly)
+      cache: createCacheStore(true, readOnly)
     });
     cacheHit = restored.hit;
-    globalCache = restored.directory;
+    globalCacheDirectory = restored.directory;
   }
-  addPath(installed.directory);
+  addPath(installation.directory);
   setOutput("version", release.version);
-  setOutput("zig-path", installed.directory);
+  setOutput("zig-path", installation.directory);
   setOutput("cache-hit", cacheHit);
-  setOutput("toolchain-cache-hit", installed.source !== "download");
-  setOutput("global-cache-dir", globalCache);
-  setOutput("sha256", installed.sha256);
-  info(`Zig ${release.version} is ready (${target.os}/${target.arch}, ${installed.source}).`);
+  setOutput("toolchain-cache-hit", installation.source !== "download");
+  setOutput("global-cache-dir", globalCacheDirectory);
+  setOutput("sha256", installation.sha256);
+  info(
+    `Zig ${release.version} is ready (${target.os}/${target.arch}, ${installation.source}).`
+  );
 }
-run().catch((error) => setFailed(message(error)));
-export {
-  run
-};
+run().catch((error) => setFailed(getErrorMessage(error)));

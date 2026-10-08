@@ -355,8 +355,8 @@ var require_errors = __commonJS({
     "use strict";
     var kUndiciError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR");
     var UndiciError = class extends Error {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "UndiciError";
         this.code = "UND_ERR";
       }
@@ -367,10 +367,10 @@ var require_errors = __commonJS({
     };
     var kConnectTimeoutError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_CONNECT_TIMEOUT");
     var ConnectTimeoutError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "ConnectTimeoutError";
-        this.message = message2 || "Connect Timeout Error";
+        this.message = message || "Connect Timeout Error";
         this.code = "UND_ERR_CONNECT_TIMEOUT";
       }
       static [Symbol.hasInstance](instance) {
@@ -380,10 +380,10 @@ var require_errors = __commonJS({
     };
     var kHeadersTimeoutError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_HEADERS_TIMEOUT");
     var HeadersTimeoutError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "HeadersTimeoutError";
-        this.message = message2 || "Headers Timeout Error";
+        this.message = message || "Headers Timeout Error";
         this.code = "UND_ERR_HEADERS_TIMEOUT";
       }
       static [Symbol.hasInstance](instance) {
@@ -393,10 +393,10 @@ var require_errors = __commonJS({
     };
     var kHeadersOverflowError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_HEADERS_OVERFLOW");
     var HeadersOverflowError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "HeadersOverflowError";
-        this.message = message2 || "Headers Overflow Error";
+        this.message = message || "Headers Overflow Error";
         this.code = "UND_ERR_HEADERS_OVERFLOW";
       }
       static [Symbol.hasInstance](instance) {
@@ -406,10 +406,10 @@ var require_errors = __commonJS({
     };
     var kBodyTimeoutError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_BODY_TIMEOUT");
     var BodyTimeoutError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "BodyTimeoutError";
-        this.message = message2 || "Body Timeout Error";
+        this.message = message || "Body Timeout Error";
         this.code = "UND_ERR_BODY_TIMEOUT";
       }
       static [Symbol.hasInstance](instance) {
@@ -419,10 +419,10 @@ var require_errors = __commonJS({
     };
     var kResponseStatusCodeError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RESPONSE_STATUS_CODE");
     var ResponseStatusCodeError = class extends UndiciError {
-      constructor(message2, statusCode, headers, body2) {
-        super(message2);
+      constructor(message, statusCode, headers, body2) {
+        super(message);
         this.name = "ResponseStatusCodeError";
-        this.message = message2 || "Response Status Code Error";
+        this.message = message || "Response Status Code Error";
         this.code = "UND_ERR_RESPONSE_STATUS_CODE";
         this.body = body2;
         this.status = statusCode;
@@ -436,10 +436,10 @@ var require_errors = __commonJS({
     };
     var kInvalidArgumentError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_INVALID_ARG");
     var InvalidArgumentError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "InvalidArgumentError";
-        this.message = message2 || "Invalid Argument Error";
+        this.message = message || "Invalid Argument Error";
         this.code = "UND_ERR_INVALID_ARG";
       }
       static [Symbol.hasInstance](instance) {
@@ -449,10 +449,10 @@ var require_errors = __commonJS({
     };
     var kInvalidReturnValueError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_INVALID_RETURN_VALUE");
     var InvalidReturnValueError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "InvalidReturnValueError";
-        this.message = message2 || "Invalid Return Value Error";
+        this.message = message || "Invalid Return Value Error";
         this.code = "UND_ERR_INVALID_RETURN_VALUE";
       }
       static [Symbol.hasInstance](instance) {
@@ -462,10 +462,10 @@ var require_errors = __commonJS({
     };
     var kAbortError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_ABORT");
     var AbortError3 = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "AbortError";
-        this.message = message2 || "The operation was aborted";
+        this.message = message || "The operation was aborted";
         this.code = "UND_ERR_ABORT";
       }
       static [Symbol.hasInstance](instance) {
@@ -475,10 +475,10 @@ var require_errors = __commonJS({
     };
     var kRequestAbortedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_ABORTED");
     var RequestAbortedError = class extends AbortError3 {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "AbortError";
-        this.message = message2 || "Request aborted";
+        this.message = message || "Request aborted";
         this.code = "UND_ERR_ABORTED";
       }
       static [Symbol.hasInstance](instance) {
@@ -488,10 +488,10 @@ var require_errors = __commonJS({
     };
     var kInformationalError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_INFO");
     var InformationalError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "InformationalError";
-        this.message = message2 || "Request information";
+        this.message = message || "Request information";
         this.code = "UND_ERR_INFO";
       }
       static [Symbol.hasInstance](instance) {
@@ -501,10 +501,10 @@ var require_errors = __commonJS({
     };
     var kRequestContentLengthMismatchError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_REQ_CONTENT_LENGTH_MISMATCH");
     var RequestContentLengthMismatchError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "RequestContentLengthMismatchError";
-        this.message = message2 || "Request body length does not match content-length header";
+        this.message = message || "Request body length does not match content-length header";
         this.code = "UND_ERR_REQ_CONTENT_LENGTH_MISMATCH";
       }
       static [Symbol.hasInstance](instance) {
@@ -514,10 +514,10 @@ var require_errors = __commonJS({
     };
     var kResponseContentLengthMismatchError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RES_CONTENT_LENGTH_MISMATCH");
     var ResponseContentLengthMismatchError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "ResponseContentLengthMismatchError";
-        this.message = message2 || "Response body length does not match content-length header";
+        this.message = message || "Response body length does not match content-length header";
         this.code = "UND_ERR_RES_CONTENT_LENGTH_MISMATCH";
       }
       static [Symbol.hasInstance](instance) {
@@ -527,10 +527,10 @@ var require_errors = __commonJS({
     };
     var kClientDestroyedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_DESTROYED");
     var ClientDestroyedError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "ClientDestroyedError";
-        this.message = message2 || "The client is destroyed";
+        this.message = message || "The client is destroyed";
         this.code = "UND_ERR_DESTROYED";
       }
       static [Symbol.hasInstance](instance) {
@@ -540,10 +540,10 @@ var require_errors = __commonJS({
     };
     var kClientClosedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_CLOSED");
     var ClientClosedError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "ClientClosedError";
-        this.message = message2 || "The client is closed";
+        this.message = message || "The client is closed";
         this.code = "UND_ERR_CLOSED";
       }
       static [Symbol.hasInstance](instance) {
@@ -553,10 +553,10 @@ var require_errors = __commonJS({
     };
     var kSocketError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_SOCKET");
     var SocketError = class extends UndiciError {
-      constructor(message2, socket) {
-        super(message2);
+      constructor(message, socket) {
+        super(message);
         this.name = "SocketError";
-        this.message = message2 || "Socket error";
+        this.message = message || "Socket error";
         this.code = "UND_ERR_SOCKET";
         this.socket = socket;
       }
@@ -567,10 +567,10 @@ var require_errors = __commonJS({
     };
     var kNotSupportedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_NOT_SUPPORTED");
     var NotSupportedError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "NotSupportedError";
-        this.message = message2 || "Not supported error";
+        this.message = message || "Not supported error";
         this.code = "UND_ERR_NOT_SUPPORTED";
       }
       static [Symbol.hasInstance](instance) {
@@ -580,10 +580,10 @@ var require_errors = __commonJS({
     };
     var kBalancedPoolMissingUpstreamError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_BPL_MISSING_UPSTREAM");
     var BalancedPoolMissingUpstreamError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "MissingUpstreamError";
-        this.message = message2 || "No upstream has been added to the BalancedPool";
+        this.message = message || "No upstream has been added to the BalancedPool";
         this.code = "UND_ERR_BPL_MISSING_UPSTREAM";
       }
       static [Symbol.hasInstance](instance) {
@@ -593,8 +593,8 @@ var require_errors = __commonJS({
     };
     var kHTTPParserError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_HTTP_PARSER");
     var HTTPParserError = class extends Error {
-      constructor(message2, code, data) {
-        super(message2);
+      constructor(message, code, data) {
+        super(message);
         this.name = "HTTPParserError";
         this.code = code ? `HPE_${code}` : void 0;
         this.data = data ? data.toString() : void 0;
@@ -606,10 +606,10 @@ var require_errors = __commonJS({
     };
     var kResponseExceededMaxSizeError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RES_EXCEEDED_MAX_SIZE");
     var ResponseExceededMaxSizeError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "ResponseExceededMaxSizeError";
-        this.message = message2 || "Response content exceeded max size";
+        this.message = message || "Response content exceeded max size";
         this.code = "UND_ERR_RES_EXCEEDED_MAX_SIZE";
       }
       static [Symbol.hasInstance](instance) {
@@ -619,10 +619,10 @@ var require_errors = __commonJS({
     };
     var kRequestRetryError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_REQ_RETRY");
     var RequestRetryError = class extends UndiciError {
-      constructor(message2, code, { headers, data }) {
-        super(message2);
+      constructor(message, code, { headers, data }) {
+        super(message);
         this.name = "RequestRetryError";
-        this.message = message2 || "Request retry error";
+        this.message = message || "Request retry error";
         this.code = "UND_ERR_REQ_RETRY";
         this.statusCode = code;
         this.data = data;
@@ -635,10 +635,10 @@ var require_errors = __commonJS({
     };
     var kResponseError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RESPONSE");
     var ResponseError = class extends UndiciError {
-      constructor(message2, code, { headers, data }) {
-        super(message2);
+      constructor(message, code, { headers, data }) {
+        super(message);
         this.name = "ResponseError";
-        this.message = message2 || "Response error";
+        this.message = message || "Response error";
         this.code = "UND_ERR_RESPONSE";
         this.statusCode = code;
         this.data = data;
@@ -651,10 +651,10 @@ var require_errors = __commonJS({
     };
     var kSecureProxyConnectionError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_PRX_TLS");
     var SecureProxyConnectionError = class extends UndiciError {
-      constructor(cause, message2, options) {
-        super(message2, { cause, ...options ?? {} });
+      constructor(cause, message, options) {
+        super(message, { cause, ...options ?? {} });
         this.name = "SecureProxyConnectionError";
-        this.message = message2 || "Secure Proxy Connection failed";
+        this.message = message || "Secure Proxy Connection failed";
         this.code = "UND_ERR_PRX_TLS";
         this.cause = cause;
       }
@@ -665,10 +665,10 @@ var require_errors = __commonJS({
     };
     var kMessageSizeExceededError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_WS_MESSAGE_SIZE_EXCEEDED");
     var MessageSizeExceededError = class extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         this.name = "MessageSizeExceededError";
-        this.message = message2 || "Max decompressed message size exceeded";
+        this.message = message || "Max decompressed message size exceeded";
         this.code = "UND_ERR_WS_MESSAGE_SIZE_EXCEEDED";
       }
       static [Symbol.hasInstance](instance) {
@@ -2671,14 +2671,14 @@ var require_connect = __commonJS({
       if (socket == null) {
         return;
       }
-      let message2 = "Connect Timeout Error";
+      let message = "Connect Timeout Error";
       if (Array.isArray(socket.autoSelectFamilyAttemptedAddresses)) {
-        message2 += ` (attempted addresses: ${socket.autoSelectFamilyAttemptedAddresses.join(", ")},`;
+        message += ` (attempted addresses: ${socket.autoSelectFamilyAttemptedAddresses.join(", ")},`;
       } else {
-        message2 += ` (attempted address: ${opts.hostname}:${opts.port},`;
+        message += ` (attempted address: ${opts.hostname}:${opts.port},`;
       }
-      message2 += ` timeout: ${opts.timeout}ms)`;
-      util6.destroy(socket, new ConnectTimeoutError(message2));
+      message += ` timeout: ${opts.timeout}ms)`;
+      util6.destroy(socket, new ConnectTimeoutError(message));
     }
     module.exports = buildConnector;
   }
@@ -3660,15 +3660,15 @@ var require_webidl = __commonJS({
     webidl.converters = {};
     webidl.util = {};
     webidl.errors = {};
-    webidl.errors.exception = function(message2) {
-      return new TypeError(`${message2.header}: ${message2.message}`);
+    webidl.errors.exception = function(message) {
+      return new TypeError(`${message.header}: ${message.message}`);
     };
     webidl.errors.conversionFailed = function(context3) {
       const plural = context3.types.length === 1 ? "" : " one of";
-      const message2 = `${context3.argument} could not be converted to${plural}: ${context3.types.join(", ")}.`;
+      const message = `${context3.argument} could not be converted to${plural}: ${context3.types.join(", ")}.`;
       return webidl.errors.exception({
         header: context3.prefix,
-        message: message2
+        message
       });
     };
     webidl.errors.invalidArgument = function(context3) {
@@ -5993,12 +5993,12 @@ var require_client_h1 = __commonJS({
           return new ResponseContentLengthMismatchError();
         }
         const ptr = llhttp.llhttp_get_error_reason(this.ptr);
-        let message2 = "";
+        let message = "";
         if (ptr) {
           const len = new Uint8Array(llhttp.memory.buffer, ptr).indexOf(0);
-          message2 = "Response does not match the HTTP/1.1 protocol (" + Buffer.from(llhttp.memory.buffer, ptr, len).toString() + ")";
+          message = "Response does not match the HTTP/1.1 protocol (" + Buffer.from(llhttp.memory.buffer, ptr, len).toString() + ")";
         }
-        return new HTTPParserError(message2, constants4.ERROR[ret], data);
+        return new HTTPParserError(message, constants4.ERROR[ret], data);
       }
       destroy() {
         assert4(this.ptr != null);
@@ -9755,9 +9755,9 @@ var require_util3 = __commonJS({
         chunks = [];
         length = 0;
       }
-      const message2 = `Response status code ${statusCode}${statusMessage ? `: ${statusMessage}` : ""}`;
+      const message = `Response status code ${statusCode}${statusMessage ? `: ${statusMessage}` : ""}`;
       if (statusCode === 204 || !contentType2 || !length) {
-        queueMicrotask(() => callback(new ResponseStatusCodeError(message2, statusCode, headers)));
+        queueMicrotask(() => callback(new ResponseStatusCodeError(message, statusCode, headers)));
         return;
       }
       const stackTraceLimit = Error.stackTraceLimit;
@@ -9773,7 +9773,7 @@ var require_util3 = __commonJS({
       } finally {
         Error.stackTraceLimit = stackTraceLimit;
       }
-      queueMicrotask(() => callback(new ResponseStatusCodeError(message2, statusCode, headers, payload)));
+      queueMicrotask(() => callback(new ResponseStatusCodeError(message, statusCode, headers, payload)));
     }
     var isContentTypeApplicationJson = (contentType2) => {
       return contentType2.length > 15 && contentType2[11] === "/" && contentType2[0] === "a" && contentType2[1] === "p" && contentType2[2] === "p" && contentType2[3] === "l" && contentType2[4] === "i" && contentType2[5] === "c" && contentType2[6] === "a" && contentType2[7] === "t" && contentType2[8] === "i" && contentType2[9] === "o" && contentType2[10] === "n" && contentType2[12] === "j" && contentType2[13] === "s" && contentType2[14] === "o" && contentType2[15] === "n";
@@ -10600,11 +10600,11 @@ var require_mock_errors = __commonJS({
     var { UndiciError } = require_errors();
     var kMockNotMatchedError = /* @__PURE__ */ Symbol.for("undici.error.UND_MOCK_ERR_MOCK_NOT_MATCHED");
     var MockNotMatchedError = class _MockNotMatchedError extends UndiciError {
-      constructor(message2) {
-        super(message2);
+      constructor(message) {
+        super(message);
         Error.captureStackTrace(this, _MockNotMatchedError);
         this.name = "MockNotMatchedError";
-        this.message = message2 || "The request does not match any registered mock dispatches";
+        this.message = message || "The request does not match any registered mock dispatches";
         this.code = "UND_MOCK_ERR_MOCK_NOT_MATCHED";
       }
       static [Symbol.hasInstance](instance) {
@@ -11789,16 +11789,16 @@ var require_dns = __commonJS({
       setRecords(origin, addresses) {
         const timestamp = Date.now();
         const records = { records: { 4: null, 6: null } };
-        for (const record2 of addresses) {
-          record2.timestamp = timestamp;
-          if (typeof record2.ttl === "number") {
-            record2.ttl = Math.min(record2.ttl, this.#maxTTL);
+        for (const record of addresses) {
+          record.timestamp = timestamp;
+          if (typeof record.ttl === "number") {
+            record.ttl = Math.min(record.ttl, this.#maxTTL);
           } else {
-            record2.ttl = this.#maxTTL;
+            record.ttl = this.#maxTTL;
           }
-          const familyRecords = records.records[record2.family] ?? { ips: [] };
-          familyRecords.ips.push(record2);
-          records.records[record2.family] = familyRecords;
+          const familyRecords = records.records[record.family] ?? { ips: [] };
+          familyRecords.ips.push(record);
+          records.records[record.family] = familyRecords;
         }
         this.#records.set(origin.hostname, records);
       }
@@ -17223,8 +17223,8 @@ var require_connection = __commonJS({
             return;
           }
           const secWSAccept = response.headersList.get("Sec-WebSocket-Accept");
-          const digest2 = crypto4.createHash("sha1").update(keyValue + uid).digest("base64");
-          if (secWSAccept !== digest2) {
+          const digest = crypto4.createHash("sha1").update(keyValue + uid).digest("base64");
+          if (secWSAccept !== digest) {
             failWebsocketConnection(ws, "Incorrect hash received in Sec-WebSocket-Accept header.");
             return;
           }
@@ -18245,15 +18245,15 @@ var require_websocket = __commonJS({
       this.ws[kResponse].socket.resume();
     }
     function onParserError(err) {
-      let message2;
+      let message;
       let code;
       if (err instanceof CloseEvent) {
-        message2 = err.reason;
+        message = err.reason;
         code = err.code;
       } else {
-        message2 = err.message;
+        message = err.message;
       }
-      fireEvent("error", this, () => new ErrorEvent("error", { error: err, message: message2 }));
+      fireEvent("error", this, () => new ErrorEvent("error", { error: err, message }));
       closeWebSocketConnection(this, code);
     }
     module.exports = {
@@ -22585,23 +22585,23 @@ var require_binary_format_contract = __commonJS({
     var UnknownFieldHandler4;
     (function(UnknownFieldHandler5) {
       UnknownFieldHandler5.symbol = /* @__PURE__ */ Symbol.for("protobuf-ts/unknown");
-      UnknownFieldHandler5.onRead = (typeName, message2, fieldNo, wireType, data) => {
-        let container = is(message2) ? message2[UnknownFieldHandler5.symbol] : message2[UnknownFieldHandler5.symbol] = [];
+      UnknownFieldHandler5.onRead = (typeName, message, fieldNo, wireType, data) => {
+        let container = is(message) ? message[UnknownFieldHandler5.symbol] : message[UnknownFieldHandler5.symbol] = [];
         container.push({ no: fieldNo, wireType, data });
       };
-      UnknownFieldHandler5.onWrite = (typeName, message2, writer) => {
-        for (let { no, wireType, data } of UnknownFieldHandler5.list(message2))
+      UnknownFieldHandler5.onWrite = (typeName, message, writer) => {
+        for (let { no, wireType, data } of UnknownFieldHandler5.list(message))
           writer.tag(no, wireType).raw(data);
       };
-      UnknownFieldHandler5.list = (message2, fieldNo) => {
-        if (is(message2)) {
-          let all = message2[UnknownFieldHandler5.symbol];
+      UnknownFieldHandler5.list = (message, fieldNo) => {
+        if (is(message)) {
+          let all = message[UnknownFieldHandler5.symbol];
           return fieldNo ? all.filter((uf) => uf.no == fieldNo) : all;
         }
         return [];
       };
-      UnknownFieldHandler5.last = (message2, fieldNo) => UnknownFieldHandler5.list(message2, fieldNo).slice(-1)[0];
-      const is = (message2) => message2 && Array.isArray(message2[UnknownFieldHandler5.symbol]);
+      UnknownFieldHandler5.last = (message, fieldNo) => UnknownFieldHandler5.list(message, fieldNo).slice(-1)[0];
+      const is = (message) => message && Array.isArray(message[UnknownFieldHandler5.symbol]);
     })(UnknownFieldHandler4 = exports2.UnknownFieldHandler || (exports2.UnknownFieldHandler = {}));
     function mergeBinaryOptions(a, b) {
       return Object.assign(Object.assign({}, a), b);
@@ -23748,13 +23748,13 @@ var require_reflection_type_check = __commonJS({
        * The number of map entries / repeated values being checked
        * is < depth.
        */
-      is(message2, depth, allowExcessProperties = false) {
+      is(message, depth, allowExcessProperties = false) {
         if (depth < 0)
           return true;
-        if (message2 === null || message2 === void 0 || typeof message2 != "object")
+        if (message === null || message === void 0 || typeof message != "object")
           return false;
         this.prepare();
-        let keys = Object.keys(message2), data = this.data;
+        let keys = Object.keys(message), data = this.data;
         if (keys.length < data.req.length || data.req.some((n) => !keys.includes(n)))
           return false;
         if (!allowExcessProperties) {
@@ -23765,7 +23765,7 @@ var require_reflection_type_check = __commonJS({
           return true;
         }
         for (const name of data.oneofs) {
-          const group = message2[name];
+          const group = message[name];
           if (!oneof_1.isOneofGroup(group))
             return false;
           if (group.oneofKind === void 0)
@@ -23779,7 +23779,7 @@ var require_reflection_type_check = __commonJS({
         for (const field of this.fields) {
           if (field.oneof !== void 0)
             continue;
-          if (!this.field(message2[field.localName], field, allowExcessProperties, depth))
+          if (!this.field(message[field.localName], field, allowExcessProperties, depth))
             return false;
         }
         return true;
@@ -23974,7 +23974,7 @@ var require_reflection_json_reader = __commonJS({
        * If a message field is already present, it will be merged with the
        * new data.
        */
-      read(input, message2, options) {
+      read(input, message, options) {
         this.prepare();
         const oneofsHandled = [];
         for (const [jsonKey, jsonValue] of Object.entries(input)) {
@@ -23993,11 +23993,11 @@ var require_reflection_json_reader = __commonJS({
             if (oneofsHandled.includes(field.oneof))
               throw new Error(`Multiple members of the oneof group "${field.oneof}" of ${this.info.typeName} are present in JSON.`);
             oneofsHandled.push(field.oneof);
-            target = message2[field.oneof] = {
+            target = message[field.oneof] = {
               oneofKind: localName
             };
           } else {
-            target = message2;
+            target = message;
           }
           if (field.kind == "map") {
             if (jsonValue === null) {
@@ -24245,8 +24245,8 @@ var require_reflection_json_writer = __commonJS({
       /**
        * Converts the message to a JSON object, based on the field descriptors.
        */
-      write(message2, options) {
-        const json = {}, source = message2;
+      write(message, options) {
+        const json = {}, source = message;
         for (const field of this.fields) {
           if (!field.oneof) {
             let jsonValue2 = this.field(field, source[field.localName], options);
@@ -24512,7 +24512,7 @@ var require_reflection_binary_reader = __commonJS({
        * If a message field is already present, it will be merged with the
        * new data.
        */
-      read(reader, message2, options, length) {
+      read(reader, message, options, length) {
         this.prepare();
         const end = length === void 0 ? reader.len : reader.pos + length;
         while (reader.pos < end) {
@@ -24523,14 +24523,14 @@ var require_reflection_binary_reader = __commonJS({
               throw new Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.info.typeName}`);
             let d = reader.skip(wireType);
             if (u !== false)
-              (u === true ? binary_format_contract_1.UnknownFieldHandler.onRead : u)(this.info.typeName, message2, fieldNo, wireType, d);
+              (u === true ? binary_format_contract_1.UnknownFieldHandler.onRead : u)(this.info.typeName, message, fieldNo, wireType, d);
             continue;
           }
-          let target = message2, repeated = field.repeat, localName = field.localName;
+          let target = message, repeated = field.repeat, localName = field.localName;
           if (field.oneof) {
             target = target[field.oneof];
             if (target.oneofKind !== localName)
-              target = message2[field.oneof] = {
+              target = message[field.oneof] = {
                 oneofKind: localName
               };
           }
@@ -24679,18 +24679,18 @@ var require_reflection_binary_writer = __commonJS({
       /**
        * Writes the message to binary format.
        */
-      write(message2, writer, options) {
+      write(message, writer, options) {
         this.prepare();
         for (const field of this.fields) {
           let value, emitDefault, repeated = field.repeat, localName = field.localName;
           if (field.oneof) {
-            const group = message2[field.oneof];
+            const group = message[field.oneof];
             if (group.oneofKind !== localName)
               continue;
             value = group[localName];
             emitDefault = true;
           } else {
-            value = message2[localName];
+            value = message[localName];
             emitDefault = false;
           }
           switch (field.kind) {
@@ -24727,7 +24727,7 @@ var require_reflection_binary_writer = __commonJS({
         }
         let u = options.writeUnknownFields;
         if (u !== false)
-          (u === true ? binary_format_contract_1.UnknownFieldHandler.onWrite : u)(this.info.typeName, message2, writer);
+          (u === true ? binary_format_contract_1.UnknownFieldHandler.onWrite : u)(this.info.typeName, message, writer);
       }
       mapEntry(writer, options, field, key, value) {
         writer.tag(field.no, binary_format_contract_1.WireType.LengthDelimited);
@@ -25090,20 +25090,20 @@ var require_message_type = __commonJS({
         this.refBinWriter = new reflection_binary_writer_1.ReflectionBinaryWriter(this);
       }
       create(value) {
-        let message2 = reflection_create_1.reflectionCreate(this);
+        let message = reflection_create_1.reflectionCreate(this);
         if (value !== void 0) {
-          reflection_merge_partial_1.reflectionMergePartial(this, message2, value);
+          reflection_merge_partial_1.reflectionMergePartial(this, message, value);
         }
-        return message2;
+        return message;
       }
       /**
        * Clone the message.
        *
        * Unknown fields are discarded.
        */
-      clone(message2) {
+      clone(message) {
         let copy = this.create();
-        reflection_merge_partial_1.reflectionMergePartial(this, copy, message2);
+        reflection_merge_partial_1.reflectionMergePartial(this, copy, message);
         return copy;
       }
       /**
@@ -25159,24 +25159,24 @@ var require_message_type = __commonJS({
       /**
        * Write the message to canonical JSON value.
        */
-      toJson(message2, options) {
-        return this.internalJsonWrite(message2, json_format_contract_1.jsonWriteOptions(options));
+      toJson(message, options) {
+        return this.internalJsonWrite(message, json_format_contract_1.jsonWriteOptions(options));
       }
       /**
        * Convert the message to canonical JSON string.
        * This is equivalent to `JSON.stringify(T.toJson(t))`
        */
-      toJsonString(message2, options) {
+      toJsonString(message, options) {
         var _a2;
-        let value = this.toJson(message2, options);
+        let value = this.toJson(message, options);
         return JSON.stringify(value, null, (_a2 = options === null || options === void 0 ? void 0 : options.prettySpaces) !== null && _a2 !== void 0 ? _a2 : 0);
       }
       /**
        * Write the message to binary format.
        */
-      toBinary(message2, options) {
+      toBinary(message, options) {
         let opt = binary_writer_1.binaryWriteOptions(options);
-        return this.internalBinaryWrite(message2, opt.writerFactory(), opt).finish();
+        return this.internalBinaryWrite(message, opt.writerFactory(), opt).finish();
       }
       /**
        * This is an internal method. If you just want to read a message from
@@ -25188,9 +25188,9 @@ var require_message_type = __commonJS({
        */
       internalJsonRead(json, options, target) {
         if (json !== null && typeof json == "object" && !Array.isArray(json)) {
-          let message2 = target !== null && target !== void 0 ? target : this.create();
-          this.refJsonReader.read(json, message2, options);
-          return message2;
+          let message = target !== null && target !== void 0 ? target : this.create();
+          this.refJsonReader.read(json, message, options);
+          return message;
         }
         throw new Error(`Unable to parse message ${this.typeName} from JSON ${json_typings_1.typeofJsonValue(json)}.`);
       }
@@ -25200,8 +25200,8 @@ var require_message_type = __commonJS({
        *
        * Writes JSON value and returns it.
        */
-      internalJsonWrite(message2, options) {
-        return this.refJsonWriter.write(message2, options);
+      internalJsonWrite(message, options) {
+        return this.refJsonWriter.write(message, options);
       }
       /**
        * This is an internal method. If you just want to write a message
@@ -25210,8 +25210,8 @@ var require_message_type = __commonJS({
        * Serializes the message in binary format and appends it to the given
        * writer. Returns passed writer.
        */
-      internalBinaryWrite(message2, writer, options) {
-        this.refBinWriter.write(message2, writer, options);
+      internalBinaryWrite(message, writer, options) {
+        this.refBinWriter.write(message, writer, options);
         return writer;
       }
       /**
@@ -25223,9 +25223,9 @@ var require_message_type = __commonJS({
        * omitted, a new instance is created first.
        */
       internalBinaryRead(reader, length, options, target) {
-        let message2 = target !== null && target !== void 0 ? target : this.create();
-        this.refBinReader.read(reader, message2, options, length);
-        return message2;
+        let message = target !== null && target !== void 0 ? target : this.create();
+        this.refBinReader.read(reader, message, options, length);
+        return message;
       }
     };
     exports2.MessageType = MessageType4;
@@ -25565,8 +25565,8 @@ var require_rpc_error = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.RpcError = void 0;
     var RpcError = class extends Error {
-      constructor(message2, code = "UNKNOWN", meta) {
-        super(message2);
+      constructor(message, code = "UNKNOWN", meta) {
+        super(message);
         this.name = "RpcError";
         Object.setPrototypeOf(this, new.target.prototype);
         this.code = code;
@@ -25789,10 +25789,10 @@ var require_rpc_output_stream = __commonJS({
        * at a time.
        * Can be used to wrap a stream by using the other stream's `onNext`.
        */
-      notifyNext(message2, error2, complete) {
-        runtime_1.assert((message2 ? 1 : 0) + (error2 ? 1 : 0) + (complete ? 1 : 0) <= 1, "only one emission at a time");
-        if (message2)
-          this.notifyMessage(message2);
+      notifyNext(message, error2, complete) {
+        runtime_1.assert((message ? 1 : 0) + (error2 ? 1 : 0) + (complete ? 1 : 0) <= 1, "only one emission at a time");
+        if (message)
+          this.notifyMessage(message);
         if (error2)
           this.notifyError(error2);
         if (complete)
@@ -25803,11 +25803,11 @@ var require_rpc_output_stream = __commonJS({
        *
        * Triggers onNext and onMessage callbacks.
        */
-      notifyMessage(message2) {
+      notifyMessage(message) {
         runtime_1.assert(!this.closed, "stream is closed");
-        this.pushIt({ value: message2, done: false });
-        this._lis.msg.forEach((l) => l(message2));
-        this._lis.nxt.forEach((l) => l(message2, void 0, false));
+        this.pushIt({ value: message, done: false });
+        this._lis.msg.forEach((l) => l(message));
+        this._lis.nxt.forEach((l) => l(message, void 0, false));
       }
       /**
        * Closes the stream with an error. Throws if stream is closed.
@@ -26410,13 +26410,13 @@ var require_test_transport = __commonJS({
       get completed() {
         return this._completed;
       }
-      send(message2) {
+      send(message) {
         if (this.data.inputMessage instanceof rpc_error_1.RpcError) {
           return Promise.reject(this.data.inputMessage);
         }
         const delayMs = this.data.inputMessage === void 0 ? 10 : this.data.inputMessage;
         return Promise.resolve(void 0).then(() => {
-          this._sent.push(message2);
+          this._sent.push(message);
         }).then(delay4(delayMs, this.abort));
       }
       complete() {
@@ -26669,19 +26669,19 @@ function toCommandProperties(annotationProperties) {
 }
 
 // node_modules/@actions/core/lib/command.js
-function issueCommand(command, properties, message2) {
-  const cmd = new Command(command, properties, message2);
+function issueCommand(command, properties, message) {
+  const cmd = new Command(command, properties, message);
   process.stdout.write(cmd.toString() + os.EOL);
 }
 var CMD_STRING = "::";
 var Command = class {
-  constructor(command, properties, message2) {
+  constructor(command, properties, message) {
     if (!command) {
       command = "missing.command";
     }
     this.command = command;
     this.properties = properties;
-    this.message = message2;
+    this.message = message;
   }
   toString() {
     let cmdStr = CMD_STRING + this.command;
@@ -26717,7 +26717,7 @@ function escapeProperty(s) {
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as os2 from "os";
-function issueFileCommand(command, message2) {
+function issueFileCommand(command, message) {
   const filePath = process.env[`GITHUB_${command}`];
   if (!filePath) {
     throw new Error(`Unable to find environment variable for file command ${command}`);
@@ -26725,7 +26725,7 @@ function issueFileCommand(command, message2) {
   if (!fs.existsSync(filePath)) {
     throw new Error(`Missing file at path: ${filePath}`);
   }
-  fs.appendFileSync(filePath, `${toCommandValue(message2)}${os2.EOL}`, {
+  fs.appendFileSync(filePath, `${toCommandValue(message)}${os2.EOL}`, {
     encoding: "utf8"
   });
 }
@@ -26907,16 +26907,16 @@ var RetryableHttpVerbs = ["OPTIONS", "GET", "DELETE", "HEAD"];
 var ExponentialBackoffCeiling = 10;
 var ExponentialBackoffTimeSlice = 5;
 var HttpClientError = class _HttpClientError extends Error {
-  constructor(message2, statusCode) {
-    super(message2);
+  constructor(message, statusCode) {
+    super(message);
     this.name = "HttpClientError";
     this.statusCode = statusCode;
     Object.setPrototypeOf(this, _HttpClientError.prototype);
   }
 };
 var HttpClientResponse = class {
-  constructor(message2) {
-    this.message = message2;
+  constructor(message) {
+    this.message = message;
   }
   readBody() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -28168,9 +28168,9 @@ var ToolRunner = class extends events.EventEmitter {
     this.args = args || [];
     this.options = options || {};
   }
-  _debug(message2) {
+  _debug(message) {
     if (this.options.listeners && this.options.listeners.debug) {
-      this.options.listeners.debug(message2);
+      this.options.listeners.debug(message);
     }
   }
   _getCommandString(options, noPrefix) {
@@ -28382,8 +28382,8 @@ var ToolRunner = class extends events.EventEmitter {
           optionsNonNull.outStream.write(this._getCommandString(optionsNonNull) + os3.EOL);
         }
         const state3 = new ExecState(optionsNonNull, this.toolPath);
-        state3.on("debug", (message2) => {
-          this._debug(message2);
+        state3.on("debug", (message) => {
+          this._debug(message);
         });
         if (this.options.cwd && !(yield exists(this.options.cwd))) {
           return reject(new Error(`The cwd: ${this.options.cwd} does not exist!`));
@@ -28541,8 +28541,8 @@ var ExecState = class _ExecState extends events.EventEmitter {
       this.timeout = setTimeout2(_ExecState.HandleTimeout, this.delay, this);
     }
   }
-  _debug(message2) {
-    this.emit("debug", message2);
+  _debug(message) {
+    this.emit("debug", message);
   }
   _setResult() {
     let error2;
@@ -28567,8 +28567,8 @@ var ExecState = class _ExecState extends events.EventEmitter {
       return;
     }
     if (!state3.processClosed && state3.processExited) {
-      const message2 = `The STDIO streams did not close within ${state3.delay / 1e3} seconds of the exit event from process '${state3.toolPath}'. This may indicate a child process inherited the STDIO streams and has not yet exited.`;
-      state3._debug(message2);
+      const message = `The STDIO streams did not close within ${state3.delay / 1e3} seconds of the exit event from process '${state3.toolPath}'. This may indicate a child process inherited the STDIO streams and has not yet exited.`;
+      state3._debug(message);
     }
     state3._setResult();
   }
@@ -28707,24 +28707,24 @@ function setOutput(name, value) {
   process.stdout.write(os5.EOL);
   issueCommand("set-output", { name }, toCommandValue(value));
 }
-function setFailed(message2) {
+function setFailed(message) {
   process.exitCode = ExitCode.Failure;
-  error(message2);
+  error(message);
 }
 function isDebug() {
   return process.env["RUNNER_DEBUG"] === "1";
 }
-function debug(message2) {
-  issueCommand("debug", {}, message2);
+function debug(message) {
+  issueCommand("debug", {}, message);
 }
-function error(message2, properties = {}) {
-  issueCommand("error", toCommandProperties(properties), message2 instanceof Error ? message2.toString() : message2);
+function error(message, properties = {}) {
+  issueCommand("error", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
-function warning(message2, properties = {}) {
-  issueCommand("warning", toCommandProperties(properties), message2 instanceof Error ? message2.toString() : message2);
+function warning(message, properties = {}) {
+  issueCommand("warning", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
-function info(message2) {
-  process.stdout.write(message2 + os5.EOL);
+function info(message) {
+  process.stdout.write(message + os5.EOL);
 }
 function saveState(name, value) {
   const filePath = process.env["GITHUB_STATE"] || "";
@@ -28741,16 +28741,16 @@ function getState(name) {
 import { createHash } from "node:crypto";
 import { mkdir as mkdir2, readFile, rename as rename2, writeFile as writeFile2 } from "node:fs/promises";
 import path5 from "node:path";
-function digest(value) {
+function hashString(value) {
   return createHash("sha256").update(value).digest("hex");
 }
-function message(error2) {
+function getErrorMessage(error2) {
   return error2 instanceof Error ? error2.message : String(error2);
 }
 async function readJson(file) {
   return JSON.parse(await readFile(file, "utf8"));
 }
-function record(value) {
+function isRecord(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 async function writeJson(file, value) {
@@ -28760,12 +28760,12 @@ async function writeJson(file, value) {
 `, { mode: 384 });
   await rename2(temporary, file);
 }
-function inside(parent, child2) {
+function isPathInside(parent, child2) {
   const relative3 = path5.relative(parent, child2);
   return relative3 !== "" && !relative3.startsWith(`..${path5.sep}`) && relative3 !== ".." && !path5.isAbsolute(relative3);
 }
 
-// src/build-cache.ts
+// src/build_cache.ts
 import { lstat as lstat2, mkdir as mkdir3, readdir as readdir2, realpath } from "node:fs/promises";
 import path12 from "node:path";
 
@@ -31448,70 +31448,103 @@ function hashFiles2(patterns_1) {
   });
 }
 
-// src/build-cache.ts
-function buildKeys(version3, target, scope, dependencies, commit) {
-  const prefix2 = `setup-zig-build-v1-${digest(`${target}
+// src/build_cache.ts
+function getBuildCacheKeys(version3, target, scope, dependencies, commit) {
+  const prefix2 = `setup-zig-build-v1-${hashString(`${target}
 ${version3}
 ${scope}`)}-`;
-  return { primary: `${prefix2}${digest(`${dependencies}
-${commit}`)}-end`, prefix: prefix2 };
+  return {
+    primary: `${prefix2}${hashString(`${dependencies}
+${commit}`)}-end`,
+    prefix: prefix2
+  };
 }
 async function restoreBuildCache(options) {
   const { root, version: version3, target, scope } = options;
-  const directory = path12.join(root, "build", digest(`${version3}
+  const directory = path12.join(
+    root,
+    "build",
+    hashString(`${version3}
 ${target}
-${scope}`));
+${scope}`)
+  );
   await mkdir3(directory, { recursive: true });
   const patterns = options.dependencyPath || "**/build.zig.zon";
-  const hasher = await create(patterns, {
+  const globber = await create(patterns, {
     followSymbolicLinks: false,
     implicitDescendants: false
   });
-  const files = await hasher.glob();
+  const files = await globber.glob();
   const workspace = await realpath(options.workspace);
   for (const file of files) {
-    if (!inside(workspace, await realpath(file)))
-      throw new Error("cache-dependency-path must match files inside the workspace.");
+    if (!isPathInside(workspace, await realpath(file))) {
+      throw new Error(
+        "cache-dependency-path must match files inside the workspace."
+      );
+    }
   }
-  if (options.dependencyPath && files.length === 0)
+  if (options.dependencyPath && files.length === 0) {
     throw new Error("cache-dependency-path did not match any files.");
+  }
   const dependencies = await hashFiles2(patterns, options.workspace, {
     followSymbolicLinks: false
   });
-  const keys = buildKeys(version3, target, scope, dependencies, process.env.GITHUB_SHA ?? "local");
-  const hit = await options.cache.restore([directory], keys.primary, [keys.prefix]);
+  const keys = getBuildCacheKeys(
+    version3,
+    target,
+    scope,
+    dependencies,
+    process.env.GITHUB_SHA ?? "local"
+  );
+  const hit = await options.cache.restore([directory], keys.primary, [
+    keys.prefix
+  ]);
   const state3 = {
     directory,
     key: keys.primary,
     maxBytes: options.maxBytes,
     readOnly: options.readOnly
   };
-  if (hit) state3.hit = hit;
+  if (hit) {
+    state3.hit = hit;
+  }
   saveState("build-cache", JSON.stringify(state3));
   exportVariable("ZIG_GLOBAL_CACHE_DIR", directory);
   return { directory, hit: hit === keys.primary };
 }
-async function directorySize(directory, limit) {
+async function getDirectorySize(directory, limit) {
   let size = 0;
   for (const entry of await readdir2(directory, { withFileTypes: true })) {
     const file = path12.join(directory, entry.name);
-    if (entry.isSymbolicLink())
+    if (entry.isSymbolicLink()) {
       throw new Error("Zig cache contains a symbolic link; skipping upload.");
-    if (entry.isDirectory()) size += await directorySize(file, limit - size);
-    else if (entry.isFile()) size += (await lstat2(file)).size;
-    else throw new Error("Zig cache contains a special file; skipping upload.");
-    if (size > limit) return size;
+    }
+    if (entry.isDirectory()) {
+      size += await getDirectorySize(file, limit - size);
+    } else if (entry.isFile()) {
+      size += (await lstat2(file)).size;
+    } else {
+      throw new Error("Zig cache contains a special file; skipping upload.");
+    }
+    if (size > limit) {
+      return size;
+    }
   }
   return size;
 }
 async function saveBuildCache(state3, root, cache) {
-  if (state3.readOnly || state3.hit === state3.key) return;
+  if (state3.readOnly || state3.hit === state3.key) {
+    return;
+  }
   const expectedRoot = path12.join(await realpath(root), "build");
   const directory = await realpath(state3.directory);
-  if (!inside(expectedRoot, directory) || !(await lstat2(state3.directory)).isDirectory())
+  if (!isPathInside(expectedRoot, directory) || !(await lstat2(state3.directory)).isDirectory()) {
     throw new Error("Unexpected Zig cache path.");
-  const size = await directorySize(directory, state3.maxBytes);
-  if (size === 0) return;
+  }
+  const size = await getDirectorySize(directory, state3.maxBytes);
+  if (size === 0) {
+    return;
+  }
   if (size > state3.maxBytes) {
     info("Zig cache exceeds cache-size-limit; skipping upload.");
     return;
@@ -31745,8 +31778,8 @@ import { URL as URL2 } from "url";
 
 // node_modules/@typespec/ts-http-runtime/dist/esm/abort-controller/AbortError.js
 var AbortError = class extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "AbortError";
   }
 };
@@ -31755,8 +31788,8 @@ var AbortError = class extends Error {
 import { EOL as EOL6 } from "node:os";
 import util3 from "node:util";
 import process2 from "node:process";
-function log(message2, ...args) {
-  process2.stderr.write(`${util3.format(message2, ...args)}${EOL6}`);
+function log(message, ...args) {
+  process2.stderr.write(`${util3.format(message, ...args)}${EOL6}`);
 }
 
 // node_modules/@typespec/ts-http-runtime/dist/esm/env.js
@@ -32524,8 +32557,8 @@ var RestError = class _RestError extends Error {
    * Bonus property set by the throw site.
    */
   details;
-  constructor(message2, options = {}) {
-    super(message2);
+  constructor(message, options = {}) {
+    super(message);
     this.name = "RestError";
     this.code = options.code;
     this.statusCode = options.statusCode;
@@ -33698,8 +33731,8 @@ function userAgentPolicy2(options = {}) {
 
 // node_modules/@azure/abort-controller/dist/esm/AbortError.js
 var AbortError2 = class extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "AbortError";
   }
 };
@@ -33752,7 +33785,7 @@ function delay2(timeInMs, options) {
 }
 
 // node_modules/@azure/core-util/dist/esm/error.js
-function getErrorMessage(e) {
+function getErrorMessage2(e) {
   if (isError(e)) {
     return e.message;
   } else {
@@ -34054,7 +34087,7 @@ function tryCreateTracingClient() {
       packageVersion: SDK_VERSION2
     });
   } catch (e) {
-    logger2.warning(`Error when creating the TracingClient: ${getErrorMessage(e)}`);
+    logger2.warning(`Error when creating the TracingClient: ${getErrorMessage2(e)}`);
     return void 0;
   }
 }
@@ -34074,7 +34107,7 @@ function tryCreateSpan(tracingClient2, request, spanAttributes) {
     }
     return { span, tracingContext: updatedOptions.tracingOptions.tracingContext };
   } catch (e) {
-    logger2.warning(`Skipping creating a tracing span due to an error: ${getErrorMessage(e)}`);
+    logger2.warning(`Skipping creating a tracing span due to an error: ${getErrorMessage2(e)}`);
     return void 0;
   }
 }
@@ -34089,7 +34122,7 @@ function tryProcessError(span, error2) {
     }
     span.end();
   } catch (e) {
-    logger2.warning(`Skipping tracing span processing due to an error: ${getErrorMessage(e)}`);
+    logger2.warning(`Skipping tracing span processing due to an error: ${getErrorMessage2(e)}`);
   }
 }
 function tryProcessResponse(span, response) {
@@ -34106,7 +34139,7 @@ function tryProcessResponse(span, response) {
     }
     span.end();
   } catch (e) {
-    logger2.warning(`Skipping tracing span processing due to an error: ${getErrorMessage(e)}`);
+    logger2.warning(`Skipping tracing span processing due to an error: ${getErrorMessage2(e)}`);
   }
 }
 
@@ -36952,11 +36985,11 @@ function validateAmpersand(xmlData, i) {
   }
   return i;
 }
-function getErrorObject(code, message2, lineNumber) {
+function getErrorObject(code, message, lineNumber) {
   return {
     err: {
       code,
-      msg: message2,
+      msg: message,
       line: lineNumber.line || lineNumber,
       col: lineNumber.col
     }
@@ -44231,8 +44264,8 @@ var BaseRequestPolicy = class {
    * @param logLevel - The log level of this log.
    * @param message - The message of this log.
    */
-  log(logLevel, message2) {
-    this._options.log(logLevel, message2);
+  log(logLevel, message) {
+    this._options.log(logLevel, message);
   }
 };
 
@@ -45381,7 +45414,7 @@ function storageRetryPolicy(options = {}) {
             logger6.error(`RetryPolicy: Caught error, message: ${e.message}, code: ${e.code}`);
             error2 = e;
           } else {
-            logger6.error(`RetryPolicy: Caught error, message: ${getErrorMessage(e)}`);
+            logger6.error(`RetryPolicy: Caught error, message: ${getErrorMessage2(e)}`);
             throw e;
           }
         }
@@ -62050,14 +62083,14 @@ var AvroRecordType = class extends AvroType {
   }
   // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
   async read(stream3, options = {}) {
-    const record2 = {};
-    record2["$schema"] = this._name;
+    const record = {};
+    record["$schema"] = this._name;
     for (const key in this._fields) {
       if (Object.prototype.hasOwnProperty.call(this._fields, key)) {
-        record2[key] = await this._fields[key].read(stream3, options);
+        record[key] = await this._fields[key].read(stream3, options);
       }
     }
-    return record2;
+    return record;
   }
 };
 
@@ -62796,15 +62829,15 @@ var logger7 = createClientLogger2("core-lro");
 
 // node_modules/@azure/core-lro/dist/esm/legacy/poller.js
 var PollerStoppedError = class _PollerStoppedError extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "PollerStoppedError";
     Object.setPrototypeOf(this, _PollerStoppedError.prototype);
   }
 };
 var PollerCancelledError = class _PollerCancelledError extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "PollerCancelledError";
     Object.setPrototypeOf(this, _PollerCancelledError.prototype);
   }
@@ -66054,16 +66087,16 @@ var KnownEncryptionAlgorithmType2;
 
 // node_modules/@actions/cache/lib/internal/shared/errors.js
 var InvalidResponseError = class extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "InvalidResponseError";
   }
 };
 var NetworkError = class extends Error {
   constructor(code) {
-    const message2 = `Unable to make request: ${code}
+    const message = `Unable to make request: ${code}
 If you are using self-hosted runners, please make sure your runner has access to all GitHub endpoints: https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#communication-between-self-hosted-runners-and-github`;
-    super(message2);
+    super(message);
     this.code = code;
     this.name = "NetworkError";
   }
@@ -66081,9 +66114,9 @@ NetworkError.isNetworkErrorCode = (code) => {
 };
 var UsageError = class extends Error {
   constructor() {
-    const message2 = `Cache storage quota has been hit. Unable to upload any new cache entries.
+    const message = `Cache storage quota has been hit. Unable to upload any new cache entries.
 More info on storage limits: https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#calculating-minute-and-storage-spending`;
-    super(message2);
+    super(message);
     this.name = "UsageError";
   }
 };
@@ -66093,8 +66126,8 @@ UsageError.isUsageErrorMessage = (msg) => {
   return msg.includes("insufficient usage");
 };
 var RateLimitError = class extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "RateLimitError";
   }
 };
@@ -67054,24 +67087,24 @@ var CacheScope$Type = class extends import_runtime6.MessageType {
     ]);
   }
   create(value) {
-    const message2 = { scope: "", permission: "0" };
-    globalThis.Object.defineProperty(message2, import_runtime5.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { scope: "", permission: "0" };
+    globalThis.Object.defineProperty(message, import_runtime5.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime4.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime4.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* string scope */
         1:
-          message2.scope = reader.string();
+          message.scope = reader.string();
           break;
         case /* int64 permission */
         2:
-          message2.permission = reader.int64().toString();
+          message.permission = reader.int64().toString();
           break;
         default:
           let u = options.readUnknownField;
@@ -67079,19 +67112,19 @@ var CacheScope$Type = class extends import_runtime6.MessageType {
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime3.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime3.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.scope !== "")
-      writer.tag(1, import_runtime2.WireType.LengthDelimited).string(message2.scope);
-    if (message2.permission !== "0")
-      writer.tag(2, import_runtime2.WireType.Varint).int64(message2.permission);
+  internalBinaryWrite(message, writer, options) {
+    if (message.scope !== "")
+      writer.tag(1, import_runtime2.WireType.LengthDelimited).string(message.scope);
+    if (message.permission !== "0")
+      writer.tag(2, import_runtime2.WireType.Varint).int64(message.permission);
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime3.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime3.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -67112,24 +67145,24 @@ var CacheMetadata$Type = class extends import_runtime11.MessageType {
     ]);
   }
   create(value) {
-    const message2 = { repositoryId: "0", scope: [] };
-    globalThis.Object.defineProperty(message2, import_runtime10.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { repositoryId: "0", scope: [] };
+    globalThis.Object.defineProperty(message, import_runtime10.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime9.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime9.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* int64 repository_id */
         1:
-          message2.repositoryId = reader.int64().toString();
+          message.repositoryId = reader.int64().toString();
           break;
         case /* repeated github.actions.results.entities.v1.CacheScope scope */
         2:
-          message2.scope.push(CacheScope.internalBinaryRead(reader, reader.uint32(), options));
+          message.scope.push(CacheScope.internalBinaryRead(reader, reader.uint32(), options));
           break;
         default:
           let u = options.readUnknownField;
@@ -67137,19 +67170,19 @@ var CacheMetadata$Type = class extends import_runtime11.MessageType {
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime8.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime8.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.repositoryId !== "0")
-      writer.tag(1, import_runtime7.WireType.Varint).int64(message2.repositoryId);
-    for (let i = 0; i < message2.scope.length; i++)
-      CacheScope.internalBinaryWrite(message2.scope[i], writer.tag(2, import_runtime7.WireType.LengthDelimited).fork(), options).join();
+  internalBinaryWrite(message, writer, options) {
+    if (message.repositoryId !== "0")
+      writer.tag(1, import_runtime7.WireType.Varint).int64(message.repositoryId);
+    for (let i = 0; i < message.scope.length; i++)
+      CacheScope.internalBinaryWrite(message.scope[i], writer.tag(2, import_runtime7.WireType.LengthDelimited).fork(), options).join();
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime8.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime8.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -67177,28 +67210,28 @@ var CreateCacheEntryRequest$Type = class extends import_runtime16.MessageType {
     ]);
   }
   create(value) {
-    const message2 = { key: "", version: "" };
-    globalThis.Object.defineProperty(message2, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { key: "", version: "" };
+    globalThis.Object.defineProperty(message, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime14.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime14.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* github.actions.results.entities.v1.CacheMetadata metadata */
         1:
-          message2.metadata = CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message2.metadata);
+          message.metadata = CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message.metadata);
           break;
         case /* string key */
         2:
-          message2.key = reader.string();
+          message.key = reader.string();
           break;
         case /* string version */
         3:
-          message2.version = reader.string();
+          message.version = reader.string();
           break;
         default:
           let u = options.readUnknownField;
@@ -67206,21 +67239,21 @@ var CreateCacheEntryRequest$Type = class extends import_runtime16.MessageType {
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.metadata)
-      CacheMetadata.internalBinaryWrite(message2.metadata, writer.tag(1, import_runtime12.WireType.LengthDelimited).fork(), options).join();
-    if (message2.key !== "")
-      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message2.key);
-    if (message2.version !== "")
-      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message2.version);
+  internalBinaryWrite(message, writer, options) {
+    if (message.metadata)
+      CacheMetadata.internalBinaryWrite(message.metadata, writer.tag(1, import_runtime12.WireType.LengthDelimited).fork(), options).join();
+    if (message.key !== "")
+      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message.key);
+    if (message.version !== "")
+      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message.version);
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -67252,28 +67285,28 @@ var CreateCacheEntryResponse$Type = class extends import_runtime16.MessageType {
     ]);
   }
   create(value) {
-    const message2 = { ok: false, signedUploadUrl: "", message: "" };
-    globalThis.Object.defineProperty(message2, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { ok: false, signedUploadUrl: "", message: "" };
+    globalThis.Object.defineProperty(message, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime14.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime14.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* bool ok */
         1:
-          message2.ok = reader.bool();
+          message.ok = reader.bool();
           break;
         case /* string signed_upload_url */
         2:
-          message2.signedUploadUrl = reader.string();
+          message.signedUploadUrl = reader.string();
           break;
         case /* string message */
         3:
-          message2.message = reader.string();
+          message.message = reader.string();
           break;
         default:
           let u = options.readUnknownField;
@@ -67281,21 +67314,21 @@ var CreateCacheEntryResponse$Type = class extends import_runtime16.MessageType {
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.ok !== false)
-      writer.tag(1, import_runtime12.WireType.Varint).bool(message2.ok);
-    if (message2.signedUploadUrl !== "")
-      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message2.signedUploadUrl);
-    if (message2.message !== "")
-      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message2.message);
+  internalBinaryWrite(message, writer, options) {
+    if (message.ok !== false)
+      writer.tag(1, import_runtime12.WireType.Varint).bool(message.ok);
+    if (message.signedUploadUrl !== "")
+      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message.signedUploadUrl);
+    if (message.message !== "")
+      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message.message);
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -67328,32 +67361,32 @@ var FinalizeCacheEntryUploadRequest$Type = class extends import_runtime16.Messag
     ]);
   }
   create(value) {
-    const message2 = { key: "", sizeBytes: "0", version: "" };
-    globalThis.Object.defineProperty(message2, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { key: "", sizeBytes: "0", version: "" };
+    globalThis.Object.defineProperty(message, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime14.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime14.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* github.actions.results.entities.v1.CacheMetadata metadata */
         1:
-          message2.metadata = CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message2.metadata);
+          message.metadata = CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message.metadata);
           break;
         case /* string key */
         2:
-          message2.key = reader.string();
+          message.key = reader.string();
           break;
         case /* int64 size_bytes */
         3:
-          message2.sizeBytes = reader.int64().toString();
+          message.sizeBytes = reader.int64().toString();
           break;
         case /* string version */
         4:
-          message2.version = reader.string();
+          message.version = reader.string();
           break;
         default:
           let u = options.readUnknownField;
@@ -67361,23 +67394,23 @@ var FinalizeCacheEntryUploadRequest$Type = class extends import_runtime16.Messag
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.metadata)
-      CacheMetadata.internalBinaryWrite(message2.metadata, writer.tag(1, import_runtime12.WireType.LengthDelimited).fork(), options).join();
-    if (message2.key !== "")
-      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message2.key);
-    if (message2.sizeBytes !== "0")
-      writer.tag(3, import_runtime12.WireType.Varint).int64(message2.sizeBytes);
-    if (message2.version !== "")
-      writer.tag(4, import_runtime12.WireType.LengthDelimited).string(message2.version);
+  internalBinaryWrite(message, writer, options) {
+    if (message.metadata)
+      CacheMetadata.internalBinaryWrite(message.metadata, writer.tag(1, import_runtime12.WireType.LengthDelimited).fork(), options).join();
+    if (message.key !== "")
+      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message.key);
+    if (message.sizeBytes !== "0")
+      writer.tag(3, import_runtime12.WireType.Varint).int64(message.sizeBytes);
+    if (message.version !== "")
+      writer.tag(4, import_runtime12.WireType.LengthDelimited).string(message.version);
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -67409,28 +67442,28 @@ var FinalizeCacheEntryUploadResponse$Type = class extends import_runtime16.Messa
     ]);
   }
   create(value) {
-    const message2 = { ok: false, entryId: "0", message: "" };
-    globalThis.Object.defineProperty(message2, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { ok: false, entryId: "0", message: "" };
+    globalThis.Object.defineProperty(message, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime14.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime14.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* bool ok */
         1:
-          message2.ok = reader.bool();
+          message.ok = reader.bool();
           break;
         case /* int64 entry_id */
         2:
-          message2.entryId = reader.int64().toString();
+          message.entryId = reader.int64().toString();
           break;
         case /* string message */
         3:
-          message2.message = reader.string();
+          message.message = reader.string();
           break;
         default:
           let u = options.readUnknownField;
@@ -67438,21 +67471,21 @@ var FinalizeCacheEntryUploadResponse$Type = class extends import_runtime16.Messa
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.ok !== false)
-      writer.tag(1, import_runtime12.WireType.Varint).bool(message2.ok);
-    if (message2.entryId !== "0")
-      writer.tag(2, import_runtime12.WireType.Varint).int64(message2.entryId);
-    if (message2.message !== "")
-      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message2.message);
+  internalBinaryWrite(message, writer, options) {
+    if (message.ok !== false)
+      writer.tag(1, import_runtime12.WireType.Varint).bool(message.ok);
+    if (message.entryId !== "0")
+      writer.tag(2, import_runtime12.WireType.Varint).int64(message.entryId);
+    if (message.message !== "")
+      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message.message);
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -67486,32 +67519,32 @@ var GetCacheEntryDownloadURLRequest$Type = class extends import_runtime16.Messag
     ]);
   }
   create(value) {
-    const message2 = { key: "", restoreKeys: [], version: "" };
-    globalThis.Object.defineProperty(message2, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { key: "", restoreKeys: [], version: "" };
+    globalThis.Object.defineProperty(message, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime14.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime14.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* github.actions.results.entities.v1.CacheMetadata metadata */
         1:
-          message2.metadata = CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message2.metadata);
+          message.metadata = CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message.metadata);
           break;
         case /* string key */
         2:
-          message2.key = reader.string();
+          message.key = reader.string();
           break;
         case /* repeated string restore_keys */
         3:
-          message2.restoreKeys.push(reader.string());
+          message.restoreKeys.push(reader.string());
           break;
         case /* string version */
         4:
-          message2.version = reader.string();
+          message.version = reader.string();
           break;
         default:
           let u = options.readUnknownField;
@@ -67519,23 +67552,23 @@ var GetCacheEntryDownloadURLRequest$Type = class extends import_runtime16.Messag
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.metadata)
-      CacheMetadata.internalBinaryWrite(message2.metadata, writer.tag(1, import_runtime12.WireType.LengthDelimited).fork(), options).join();
-    if (message2.key !== "")
-      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message2.key);
-    for (let i = 0; i < message2.restoreKeys.length; i++)
-      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message2.restoreKeys[i]);
-    if (message2.version !== "")
-      writer.tag(4, import_runtime12.WireType.LengthDelimited).string(message2.version);
+  internalBinaryWrite(message, writer, options) {
+    if (message.metadata)
+      CacheMetadata.internalBinaryWrite(message.metadata, writer.tag(1, import_runtime12.WireType.LengthDelimited).fork(), options).join();
+    if (message.key !== "")
+      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message.key);
+    for (let i = 0; i < message.restoreKeys.length; i++)
+      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message.restoreKeys[i]);
+    if (message.version !== "")
+      writer.tag(4, import_runtime12.WireType.LengthDelimited).string(message.version);
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -67567,28 +67600,28 @@ var GetCacheEntryDownloadURLResponse$Type = class extends import_runtime16.Messa
     ]);
   }
   create(value) {
-    const message2 = { ok: false, signedDownloadUrl: "", matchedKey: "" };
-    globalThis.Object.defineProperty(message2, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
+    const message = { ok: false, signedDownloadUrl: "", matchedKey: "" };
+    globalThis.Object.defineProperty(message, import_runtime15.MESSAGE_TYPE, { enumerable: false, value: this });
     if (value !== void 0)
-      (0, import_runtime14.reflectionMergePartial)(this, message2, value);
-    return message2;
+      (0, import_runtime14.reflectionMergePartial)(this, message, value);
+    return message;
   }
   internalBinaryRead(reader, length, options, target) {
-    let message2 = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+    let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
     while (reader.pos < end) {
       let [fieldNo, wireType] = reader.tag();
       switch (fieldNo) {
         case /* bool ok */
         1:
-          message2.ok = reader.bool();
+          message.ok = reader.bool();
           break;
         case /* string signed_download_url */
         2:
-          message2.signedDownloadUrl = reader.string();
+          message.signedDownloadUrl = reader.string();
           break;
         case /* string matched_key */
         3:
-          message2.matchedKey = reader.string();
+          message.matchedKey = reader.string();
           break;
         default:
           let u = options.readUnknownField;
@@ -67596,21 +67629,21 @@ var GetCacheEntryDownloadURLResponse$Type = class extends import_runtime16.Messa
             throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
           let d = reader.skip(wireType);
           if (u !== false)
-            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message2, fieldNo, wireType, d);
+            (u === true ? import_runtime13.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
       }
     }
-    return message2;
+    return message;
   }
-  internalBinaryWrite(message2, writer, options) {
-    if (message2.ok !== false)
-      writer.tag(1, import_runtime12.WireType.Varint).bool(message2.ok);
-    if (message2.signedDownloadUrl !== "")
-      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message2.signedDownloadUrl);
-    if (message2.matchedKey !== "")
-      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message2.matchedKey);
+  internalBinaryWrite(message, writer, options) {
+    if (message.ok !== false)
+      writer.tag(1, import_runtime12.WireType.Varint).bool(message.ok);
+    if (message.signedDownloadUrl !== "")
+      writer.tag(2, import_runtime12.WireType.LengthDelimited).string(message.signedDownloadUrl);
+    if (message.matchedKey !== "")
+      writer.tag(3, import_runtime12.WireType.LengthDelimited).string(message.matchedKey);
     let u = options.writeUnknownFields;
     if (u !== false)
-      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message2, writer);
+      (u == true ? import_runtime13.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
     return writer;
   }
 };
@@ -68106,38 +68139,38 @@ var __awaiter18 = function(thisArg, _arguments, P, generator) {
   });
 };
 var ValidationError = class _ValidationError extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "ValidationError";
     Object.setPrototypeOf(this, _ValidationError.prototype);
   }
 };
 var ReserveCacheError = class _ReserveCacheError extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "ReserveCacheError";
     Object.setPrototypeOf(this, _ReserveCacheError.prototype);
   }
 };
 var CACHE_WRITE_DENIED_PREFIX = "cache write denied:";
 var CacheWriteDeniedError = class _CacheWriteDeniedError extends ReserveCacheError {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "CacheWriteDeniedError";
     Object.setPrototypeOf(this, _CacheWriteDeniedError.prototype);
   }
 };
 var CACHE_READ_DENIED_PREFIX = CacheReadDeniedMessagePrefix;
 var CacheReadDeniedError = class _CacheReadDeniedError extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "CacheReadDeniedError";
     Object.setPrototypeOf(this, _CacheReadDeniedError.prototype);
   }
 };
 var FinalizeCacheError = class _FinalizeCacheError extends Error {
-  constructor(message2) {
-    super(message2);
+  constructor(message) {
+    super(message);
     this.name = "FinalizeCacheError";
     Object.setPrototypeOf(this, _FinalizeCacheError.prototype);
   }
@@ -68515,26 +68548,35 @@ function saveCacheV2(paths_1, key_1, options_1) {
 }
 
 // src/cache.ts
-function cacheStore(enabled2, readOnly) {
+function createCacheStore(enabled2, readOnly) {
   const available = enabled2 && isFeatureAvailable();
-  if (enabled2 && !available)
-    info("Actions cache is unavailable; continuing without remote caching.");
+  if (enabled2 && !available) {
+    info(
+      "Actions cache is unavailable; continuing without remote caching."
+    );
+  }
   return {
     async restore(paths, key, prefixes = []) {
-      if (!available) return void 0;
+      if (!available) {
+        return void 0;
+      }
       try {
-        return await restoreCache(paths, key, prefixes, { segmentTimeoutInMs: 6e4 });
+        return await restoreCache(paths, key, prefixes, {
+          segmentTimeoutInMs: 6e4
+        });
       } catch (error2) {
-        warning(`Could not restore cache: ${message(error2)}`);
+        warning(`Could not restore cache: ${getErrorMessage(error2)}`);
         return void 0;
       }
     },
     async save(paths, key) {
-      if (!available || readOnly) return;
+      if (!available || readOnly) {
+        return;
+      }
       try {
         await saveCache2(paths, key);
       } catch (error2) {
-        warning(`Could not save cache: ${message(error2)}`);
+        warning(`Could not save cache: ${getErrorMessage(error2)}`);
       }
     }
   };
@@ -68559,16 +68601,16 @@ export {
   warning,
   info,
   getState,
-  digest,
-  message,
+  hashString,
+  getErrorMessage,
   readJson,
-  record,
+  isRecord,
   writeJson,
-  inside,
+  isPathInside,
   restoreBuildCache,
   saveBuildCache,
   require_semver2 as require_semver,
-  cacheStore
+  createCacheStore
 };
 /*! Bundled license information:
 

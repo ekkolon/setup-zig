@@ -7,6 +7,8 @@ npm ci
 npm run check
 ```
 
+Follow the [Google TypeScript style guide](https://google.github.io/styleguide/tsguide.html). Run `npm run format` before committing. Use descriptive names and document non-obvious contracts with concise JSDoc; use line comments to explain implementation decisions. Avoid repeating what the types and code already say.
+
 Commit `dist/` whenever source or runtime dependencies change. Consumers run these bundles directly without installing npm packages. CI rebuilds them and checks for differences. Bundled dependency licenses are generated alongside the code.
 
 Unit tests use Node's test runner and make no network requests. To test a real download, signature verification, extraction, and offline reuse of the runner cache:
