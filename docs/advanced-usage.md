@@ -45,6 +45,14 @@ Check out the repository before reading a version file or hashing dependencies. 
   working-directory: packages/server
 ```
 
+## Cache behavior
+
+Exact compiler versions do not require the version index. Ranges and `master` use an index cached for one hour; `check-latest: true` forces a refresh. The community mirror list is cached for one day and can remain usable for up to seven days if the origin is unavailable.
+
+Build-cache keys include the platform, exact Zig version, `cache-key`, dependency-file contents, and commit. When there is no exact match, an older cache can be restored within the same platform, compiler, and scope. Exact hits are not uploaded again; caches exceeding `cache-size-limit` are skipped. Cache-service failures do not stop installation.
+
+Setting `cache-toolchain: false` disables GitHub Actions archive and metadata caches, but the runner's local tool cache remains available. `cache: false` disables only the Zig build cache. All restored compiler archives are signature-verified again before extraction.
+
 ## Read-only caches
 
 ```yaml

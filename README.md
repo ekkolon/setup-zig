@@ -1,8 +1,6 @@
 # setup-zig
 
-Set up Zig in GitHub Actions on Linux, macOS, and Windows.
-
-Downloads come from [Zig community mirrors](https://ziglang.org/download/community-mirrors/). Every compiler archive is verified with the Zig release key before extraction, including archives restored from cache.
+Install Zig in GitHub Actions on Linux, macOS, and Windows. Supports releases, version ranges, and development builds. Downloads and cached archives are verified against Zig's minisign release key.
 
 ## Usage
 
@@ -25,22 +23,22 @@ jobs:
       - run: zig build test
 ```
 
-Pin the action to a full commit SHA when you need an immutable dependency. Pin Zig to an exact version for reproducible builds.
+Pin Zig to an exact version for reproducible builds. For stronger supply-chain guarantees, pin the action to a commit SHA instead of `v1`.
 
 ## Versions
 
-| Input | Installs |
+| Value | Installs |
 | --- | --- |
-| `0.17.0` | An exact release |
-| `0.17.x` | The newest matching release |
-| `>=0.16.0 <0.18.0` | The newest release in a range |
-| `latest` | The newest stable release (default) |
-| `master` | The current development build |
-| `0.18.0-dev.35+5e754304d` | An exact development build, while available from mirrors |
+| `0.17.0` | Exact release |
+| `0.17.x` | Latest matching release |
+| `>=0.16.0 <0.18.0` | Latest release in the range |
+| `latest` | Latest stable release (default) |
+| `master` | Current development build |
+| `0.18.0-dev.35+5e754304d` | Exact development build, if still available |
 
-Zig 0.7.0 and newer are supported where Zig publishes a signed binary for the requested platform. Ranges select stable releases. The action preserves the full commit hash in development versions.
+Zig 0.7.0 and newer are supported where a signed binary exists for the selected platform. Ranges select stable releases. Development versions retain their full commit hashes.
 
-To keep the version in your repository:
+You can also read the version from `.zigversion`, `.tool-versions`, or `build.zig.zon`:
 
 ```yaml
 - uses: actions/checkout@v7
@@ -49,36 +47,34 @@ To keep the version in your repository:
     version-file: .zigversion
 ```
 
-A plain version file contains one version or range. `.tool-versions` reads the `zig` entry. `build.zig.zon` reads the top-level `minimum_zig_version` as an exact version; it does not choose a newer compiler. `version` takes precedence when both inputs are set.
+A plain version file contains one version or range. `.tool-versions` uses the `zig` entry; `build.zig.zon` uses the top-level `minimum_zig_version` as an exact version. An explicit `version` takes precedence over `version-file`.
 
 ## Inputs
 
 | Input | Default | Description |
 | --- | --- | --- |
-| `version` | `latest`* | Release, range, or development build |
-| `version-file` | | Version file relative to the workspace |
-| `architecture` | Runtime architecture | `x64`, `arm64`, or `x86` |
-| `check-latest` | `false` | Refresh the index before resolving a range or `master` |
-| `checksum` | | Additional SHA-256 archive checksum |
-| `mirror` | Community mirrors | Use a single HTTPS mirror |
-| `cache` | `true` | Cache Zig packages and global compilation results |
-| `cache-toolchain` | `true` | Cache signed archives and download metadata in Actions cache |
-| `cache-read-only` | `false` | Restore Actions caches without uploading new entries |
-| `cache-key` | | Additional build-cache scope, useful for matrix jobs |
+| `version` | `latest`¹ | Release, range, or development build |
+| `version-file` | | File containing the Zig version |
+| `architecture` | Runner architecture | `x64`, `arm64`, or `x86` |
+| `check-latest` | `false` | Refresh the version index for ranges and `master` |
+| `checksum` | | Additional archive SHA-256 verification |
+| `mirror` | Community mirrors | Exclusive HTTPS mirror URL |
+| `cache` | `true` | Cache Zig's global build directory |
+| `cache-toolchain` | `true` | Cache signed compiler archives and metadata |
+| `cache-read-only` | `false` | Restore caches without uploading |
+| `cache-key` | | Additional build-cache scope |
 | `cache-dependency-path` | `**/build.zig.zon` | Dependency-file globs, one per line |
 | `cache-size-limit` | `2048` | Maximum build-cache upload size in MiB |
 
-\* `latest` is used only when neither version input is set.
+¹ Used only when neither version input is set.
 
 ## Caching
 
-Compiler archives are reused from the runner tool cache, then GitHub Actions cache, before trying a mirror. Both the archive signature and its signed filename are checked on every use. An optional checksum is also checked on cache hits.
+Compiler archives are restored from the runner tool cache or GitHub Actions cache before downloading from a mirror. Every archive is signature-verified before extraction, including cache hits.
 
-Exact pins do not request the version index. Ranges and `master` share an index cached for one hour; `check-latest: true` refreshes it immediately. The mirror list is cached for one day and fetched only when an archive download is needed. Refreshes use HTTP validators when available. There is no automatic compiler-download fallback to ziglang.org.
+The global Zig cache is restored before the build and saved after a successful job. Cache keys separate Zig versions, platforms, and optional project scopes. Disable it with `cache: false`; use `cache-toolchain: false` to disable remote archive and metadata caching. Cache failures do not prevent installation.
 
-Build caching sets `ZIG_GLOBAL_CACHE_DIR` to a directory managed by the action. Keys include the platform, full compiler version, `cache-key`, dependency-file contents, and commit. A miss can reuse an older cache for the same platform, compiler, and scope. New entries are saved after successful jobs. Exact hits are not uploaded again. Caches over the size limit are left on disk and skipped.
-
-Set `cache: false` to manage Zig's build cache yourself. Compiler and metadata caching remain enabled. Set `cache-toolchain: false` to disable those Actions caches too; the runner tool cache is still used. Cache service failures produce warnings and do not prevent installation.
+See [advanced usage](docs/advanced-usage.md) for cache keys, mirror behavior, monorepos, and matrix builds.
 
 ## Outputs
 
@@ -86,15 +82,15 @@ Set `cache: false` to manage Zig's build cache yourself. Compiler and metadata c
 | --- | --- |
 | `version` | Exact installed version |
 | `zig-path` | Directory containing `zig` |
-| `sha256` | SHA-256 of the verified archive |
-| `toolchain-cache-hit` | `true` when the compiler archive was cached |
-| `cache-hit` | `true` for an exact build-cache match |
-| `global-cache-dir` | Configured global cache directory |
+| `sha256` | Verified archive SHA-256 |
+| `toolchain-cache-hit` | Archive restored from a cache |
+| `cache-hit` | Exact build-cache match |
+| `global-cache-dir` | Configured Zig global cache directory |
 
-## Runners
+## Requirements
 
-Linux, macOS, and Windows are supported on x64 and arm64. Linux and Windows also accept `architecture: x86` when Zig provides a binary and the host can run it. `architecture` selects the compiler executable, not a compilation target; use Zig's `-Dtarget` option for cross-compilation.
+Linux, macOS, and Windows are supported on x64 and arm64. Linux and Windows also support x86 when a compatible Zig binary and host are available. `architecture` selects the compiler executable, not the compilation target.
 
-The action runs on Node 24, supplied by the Actions runner. Self-hosted runners need runner version 2.327.1 or newer. Linux and macOS need `tar` with xz support; Windows needs PowerShell. Actions caching also requires the tools described in [actions/cache](https://github.com/actions/cache#usage). No separate Node installation or GitHub token input is needed.
+The action uses Node 24 supplied by the Actions runner. Self-hosted runners need version 2.327.1 or later. Linux and macOS require `tar` with xz support; Windows requires PowerShell. No Node installation step or GitHub token input is needed.
 
-[More examples](docs/advanced-usage.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [License](LICENSE)
+[Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [License](LICENSE)

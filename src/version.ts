@@ -85,6 +85,16 @@ export function resolvePlatform(os: string, arch: string): Platform {
   return {os: operatingSystem, arch: architecture};
 }
 
+/** Zig used i386 for 32-bit x86 archives before 0.11.0. */
+function getPublishedArchitecture(
+  version: string,
+  architecture: Platform['arch'],
+): string {
+  return architecture === 'x86' && semver.lt(version, '0.11.0')
+    ? 'i386'
+    : architecture;
+}
+
 export function getArchiveFilenames(
   version: string,
   target: Platform,
@@ -93,8 +103,9 @@ export function getArchiveFilenames(
     throw new Error('Expected an exact Zig version.');
   }
   const extension = target.os === 'windows' ? 'zip' : 'tar.xz';
-  const current = `zig-${target.arch}-${target.os}-${version}.${extension}`;
-  const legacy = `zig-${target.os}-${target.arch}-${version}.${extension}`;
+  const architecture = getPublishedArchitecture(version, target.arch);
+  const current = `zig-${architecture}-${target.os}-${version}.${extension}`;
+  const legacy = `zig-${target.os}-${architecture}-${version}.${extension}`;
   // Snapshots around the 0.14/0.15 transition used both naming schemes.
   if (version.startsWith('0.15.0-dev.')) {
     return [current, legacy];
@@ -129,7 +140,7 @@ export function resolveReleaseFromIndex(
   }
   const entry = index[request.kind === 'master' ? 'master' : version];
   const artifact = isRecord(entry)
-    ? entry[`${target.arch}-${target.os}`]
+    ? entry[`${getPublishedArchitecture(version, target.arch)}-${target.os}`]
     : undefined;
   if (
     !isRecord(artifact) ||

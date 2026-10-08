@@ -84,6 +84,35 @@ test('archive names cover old releases and the development transition', () => {
     ['zig-aarch64-windows-0.17.0.zip'],
   );
 });
+test('legacy 32-bit archives use i386 through Zig 0.10.x', () => {
+  const linux = resolvePlatform('linux', 'x86');
+  const windows = resolvePlatform('win32', 'x86');
+  assert.deepEqual(getArchiveFilenames('0.7.0', linux), [
+    'zig-linux-i386-0.7.0.tar.xz',
+  ]);
+  assert.deepEqual(getArchiveFilenames('0.10.1', windows), [
+    'zig-windows-i386-0.10.1.zip',
+  ]);
+  assert.deepEqual(getArchiveFilenames('0.11.0', linux), [
+    'zig-linux-x86-0.11.0.tar.xz',
+  ]);
+  const legacyIndex = {
+    master: {version: '0.17.0'},
+    '0.7.0': {
+      'i386-linux': {
+        tarball: 'https://ziglang.org/download/0.7.0/zig-linux-i386-0.7.0.tar.xz',
+        shasum: 'a'.repeat(64),
+        size: '38530596',
+      },
+    },
+  };
+  assert.deepEqual(
+    resolveReleaseFromIndex(legacyIndex, parseVersionRequest('0.7.x'), linux)
+      .filenames,
+    ['zig-linux-i386-0.7.0.tar.xz'],
+  );
+});
+
 const index = {
   master: {
     version: '0.18.0-dev.35+5e754304d',
